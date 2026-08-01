@@ -1,0 +1,2245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071518">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="《肠境：免疫围城》是一款以不完全信息、治疗路径和肿瘤生态为核心的结直肠癌免疫策略教学游戏。">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="肠境：免疫围城 · Public Preview">
+  <meta property="og:description" content="检测有限，时间有限，毒性有限。通过证据、机制假设和固定治疗路径理解肿瘤生态。">
+  <meta property="og:image" content="">
+  <title>肠境：免疫围城 · Public Preview</title>
+  <style>
+:root {
+  color-scheme: dark;
+  font-size: clamp(18px, 0.35vw + 16px, 19px);
+  --bg: #061316;
+  --bg-deep: #030b0d;
+  --surface: #0d2024;
+  --surface-2: #112a2f;
+  --surface-3: #17343a;
+  --line: rgba(169, 226, 221, 0.16);
+  --line-strong: rgba(169, 226, 221, 0.34);
+  --text: #eef8f5;
+  --muted: #a8bfbc;
+  --faint: #76928f;
+  --cyan: #63e6d5;
+  --cyan-strong: #21bea9;
+  --teal: #2ec6a4;
+  --amber: #f0c36b;
+  --red: #ff8d83;
+  --blue: #83b9ff;
+  --clinical: #64d3a8;
+  --research: #8ab6ff;
+  --mechanism: #d1a2ff;
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.26);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --topbar: 84px;
+  --nav: 92px;
+  --content-max: 1680px;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--bg-deep); scroll-behavior: smooth; }
+body { margin: 0; min-height: 100vh; overflow-x: hidden; background: radial-gradient(circle at 15% -10%, rgba(34, 143, 133, 0.13), transparent 34%), linear-gradient(180deg, var(--bg), var(--bg-deep)); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.62; text-rendering: optimizeLegibility; }
+body[data-text-scale="large"] { font-size: 1.1rem; }
+body[data-text-scale="xlarge"] { font-size: 1.2rem; }
+body.high-contrast { --line: rgba(222, 250, 246, 0.3); --line-strong: rgba(222, 250, 246, 0.62); --muted: #c7d8d5; --faint: #a8bfbc; }
+body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { scroll-behavior: auto !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+button, input, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { color: inherit; }
+a { color: var(--cyan); text-underline-offset: 0.2em; }
+img, canvas { max-width: 100%; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, canvas:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.is-hidden { display: none !important; }
+
+.skip-link { position: fixed; z-index: 500; top: 0.5rem; left: 0.5rem; transform: translateY(-160%); padding: 0.65rem 0.9rem; border-radius: 10px; background: var(--text); color: #071518; font-weight: 800; }
+.skip-link:focus { transform: translateY(0); }
+
+.boot-screen, .fatal-screen { min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+.boot-screen h1, .fatal-screen h1 { margin: 1rem 0 0.35rem; font-size: clamp(1.7rem, 3vw, 2.6rem); }
+.boot-screen p, .fatal-screen p { color: var(--muted); }
+.boot-mark { display: flex; align-items: center; gap: 0.55rem; justify-content: center; }
+.boot-mark span { width: 15px; height: 15px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 24px rgba(99, 230, 213, 0.6); animation: pulse 1.2s infinite alternate; }
+.boot-mark span:nth-child(2) { animation-delay: 0.2s; }
+.boot-mark span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { to { opacity: 0.25; transform: scale(0.72); } }
+.fatal-card { max-width: 680px; padding: 2rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+
+.eyebrow { margin: 0 0 0.35rem; color: var(--cyan); font-size: 0.78rem; font-weight: 850; letter-spacing: 0.14em; text-transform: uppercase; }
+.button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.68rem 1rem; border: 1px solid transparent; border-radius: 12px; cursor: pointer; text-decoration: none; font-weight: 800; transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease; }
+.button:hover:not(:disabled) { transform: translateY(-1px); }
+.button:disabled { cursor: not-allowed; opacity: 0.48; }
+.button.primary { background: linear-gradient(135deg, var(--cyan), #78f1c7); color: #05201c; box-shadow: 0 10px 30px rgba(48, 205, 181, 0.18); }
+.button.secondary { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.035); color: var(--text); }
+.button.danger { border-color: rgba(255, 141, 131, 0.45); background: rgba(255, 141, 131, 0.1); color: #ffd2ce; }
+.button.large { min-height: 58px; padding: 0.9rem 1.3rem; font-size: 1.05rem; }
+
+.brand { display: inline-flex; align-items: center; gap: 0.7rem; color: var(--text); text-decoration: none; }
+.brand strong, .brand small { display: block; }
+.brand strong { font-size: 1.02rem; line-height: 1.15; }
+.brand small { margin-top: 0.12rem; color: var(--muted); font-size: 0.67rem; letter-spacing: 0.05em; }
+.brand-mark { width: 48px; height: 48px; position: relative; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: radial-gradient(circle, rgba(99, 230, 213, 0.22), transparent 70%); }
+.brand-mark i { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--cyan); }
+.brand-mark i:nth-child(1) { transform: translate(-9px, 6px); }
+.brand-mark i:nth-child(2) { transform: translate(8px, -8px); opacity: 0.72; }
+.brand-mark i:nth-child(3) { transform: translate(7px, 10px); opacity: 0.45; }
+
+.landing { min-height: 100vh; position: relative; display: flex; flex-direction: column; overflow: hidden; background: radial-gradient(circle at 75% 35%, rgba(53, 183, 166, 0.12), transparent 30%), linear-gradient(145deg, #07181b, #031012 72%); }
+.landing-noise { position: absolute; inset: 0; pointer-events: none; opacity: 0.2; background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(to bottom, black, transparent 90%); }
+.landing-header, .landing-footer { position: relative; z-index: 2; width: min(100% - 3rem, var(--content-max)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.landing-header { min-height: 92px; }
+.landing-links { display: flex; align-items: center; gap: 1rem; }
+.landing-links a, .text-button { color: var(--muted); font-size: 0.82rem; font-weight: 750; text-decoration: none; }
+.text-button { border: 1px solid var(--line); border-radius: 10px; background: transparent; padding: 0.45rem 0.7rem; cursor: pointer; }
+.landing-main { position: relative; z-index: 1; width: min(100% - 3rem, var(--content-max)); margin: auto; display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(520px, 1.08fr); gap: clamp(2rem, 5vw, 6rem); align-items: center; padding: 3rem 0 5rem; }
+.landing-copy h1 { max-width: 900px; margin: 0; font-size: clamp(3rem, 5.7vw, 6.4rem); line-height: 0.98; letter-spacing: -0.055em; }
+.landing-copy h1 em { color: var(--cyan); font-style: normal; }
+.landing-lead { max-width: 720px; margin: 1.4rem 0 0; color: #c4d8d5; font-size: clamp(1.1rem, 1.25vw, 1.36rem); }
+.landing-actions { margin-top: 1.8rem; }
+.boundary-strip { max-width: 760px; margin-top: 1.4rem; display: grid; grid-template-columns: auto 1fr; gap: 0.7rem; align-items: start; padding: 0.85rem 1rem; border: 1px solid rgba(240, 195, 107, 0.27); border-radius: 12px; background: rgba(240, 195, 107, 0.07); font-size: 0.82rem; }
+.boundary-strip strong { color: var(--amber); white-space: nowrap; }
+.boundary-strip span { color: var(--muted); }
+.landing-visual { position: relative; min-height: 610px; display: grid; place-items: center; }
+.landing-visual canvas { width: min(100%, 760px); aspect-ratio: 1.22; border-radius: 50%; filter: drop-shadow(0 25px 60px rgba(0,0,0,0.38)); }
+.visual-caption { position: absolute; bottom: 1rem; right: 0; padding: 0.5rem 0.7rem; border: 1px solid var(--line); border-radius: 9px; background: rgba(5, 16, 18, 0.8); color: var(--muted); font-size: 0.7rem; backdrop-filter: blur(10px); }
+.visual-caption span { color: var(--cyan); }
+.landing-footer { min-height: 70px; border-top: 1px solid var(--line); color: var(--faint); font-size: 0.72rem; }
+
+.app-shell { min-height: 100vh; }
+.topbar { position: fixed; z-index: 80; inset: 0 0 auto 0; height: var(--topbar); display: grid; grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr); align-items: center; gap: 1rem; padding: 0 1.2rem; border-bottom: 1px solid var(--line); background: rgba(5, 17, 20, 0.9); backdrop-filter: blur(20px); }
+.compact-brand .brand-mark { width: 42px; height: 42px; }
+.status-strip { display: flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.status-strip div { min-width: 120px; padding: 0.42rem 0.75rem; text-align: center; border-right: 1px solid var(--line); }
+.status-strip div:last-child { border-right: 0; }
+.status-strip span, .status-strip strong { display: block; line-height: 1.25; }
+.status-strip span { color: var(--faint); font-size: 0.61rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.status-strip strong { margin-top: 0.12rem; font-size: 0.78rem; }
+.top-actions { justify-self: end; display: flex; gap: 0.45rem; }
+.icon-button { min-width: 46px; height: 44px; padding: 0 0.7rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.035); color: var(--muted); cursor: pointer; font-size: 0.72rem; font-weight: 800; }
+.icon-button:hover { color: var(--text); border-color: var(--line-strong); }
+.side-nav { position: fixed; z-index: 70; top: var(--topbar); bottom: 0; left: 0; width: var(--nav); display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 0.55rem; border-right: 1px solid var(--line); background: rgba(5, 17, 20, 0.88); backdrop-filter: blur(18px); }
+.nav-button { min-height: 70px; display: grid; place-items: center; gap: 0.05rem; border: 1px solid transparent; border-radius: 13px; background: transparent; color: var(--faint); cursor: pointer; }
+.nav-button span { font-size: 1.3rem; line-height: 1; }
+.nav-button b { font-size: 0.66rem; }
+.nav-button:hover, .nav-button.is-active { border-color: var(--line); background: rgba(99, 230, 213, 0.07); color: var(--cyan); }
+.workspace { min-height: calc(100vh - 62px); margin-left: var(--nav); padding: calc(var(--topbar) + 2rem) 1.4rem 5.5rem; }
+.view { width: min(100%, var(--content-max)); margin-inline: auto; display: none; }
+.view.is-active { display: block; animation: fade-in 0.22s ease; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(5px); } }
+.view-head { min-height: 92px; display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; margin-bottom: 1rem; }
+.view-head h2 { margin: 0; font-size: clamp(1.7rem, 2.5vw, 2.5rem); line-height: 1.15; }
+.view-subtitle { max-width: 900px; margin: 0.45rem 0 0; color: var(--muted); font-size: 0.88rem; }
+.view-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; padding-top: 0.3rem; }
+
+.progress-rail { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.55rem; margin-bottom: 1rem; }
+.progress-node { min-width: 0; padding: 0.58rem 0.7rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.025); color: var(--faint); font-size: 0.7rem; }
+.progress-node strong, .progress-node span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.progress-node strong { color: inherit; font-size: 0.78rem; }
+.progress-node.is-current { border-color: rgba(99, 230, 213, 0.48); background: rgba(99, 230, 213, 0.09); color: var(--cyan); }
+.progress-node.is-complete { color: #b6dbd4; }
+
+.command-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "case hypothesis" "pathway evidence" "prediction events"; gap: 1rem; align-items: start; }
+.command-grid > .panel { min-width: 0; }
+.case-panel { grid-area: case; }
+.hypothesis-panel { grid-area: hypothesis; }
+.pathway-panel { grid-area: pathway; }
+.evidence-plan-panel { grid-area: evidence; }
+.prediction-panel { grid-area: prediction; }
+.event-panel { grid-area: events; }
+.panel { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(17, 39, 43, 0.95), rgba(8, 24, 28, 0.96)); box-shadow: 0 12px 42px rgba(0,0,0,0.14); }
+.panel-head { min-height: 68px; display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); }
+.panel-head > div { min-width: 0; display: flex; align-items: center; gap: 0.65rem; }
+.panel-head h3 { margin: 0; font-size: 1.02rem; line-height: 1.3; }
+.panel-index { flex: 0 0 auto; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--cyan); font-size: 0.72rem; font-weight: 900; }
+.panel-body { padding: 1rem; }
+.panel-note { margin: 0.85rem 1rem 0; color: var(--muted); font-size: 0.78rem; }
+.badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0.2rem 0.5rem; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: 0.63rem; font-weight: 800; white-space: nowrap; }
+.badge.clinical { border-color: rgba(100, 211, 168, 0.32); color: var(--clinical); }
+.badge.research { border-color: rgba(138, 182, 255, 0.32); color: var(--research); }
+
+.fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+.fact { min-height: 92px; padding: 0.7rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.025); }
+.fact span, .fact strong, .fact small { display: block; }
+.fact span { color: var(--faint); font-size: 0.64rem; }
+.fact strong { margin-top: 0.25rem; font-size: 0.92rem; }
+.fact small { margin-top: 0.2rem; color: var(--muted); font-size: 0.65rem; }
+.risk-list { margin: 0.8rem 0 0; padding: 0; list-style: none; }
+.risk-list li { display: grid; grid-template-columns: 10px 1fr; gap: 0.55rem; padding: 0.48rem 0; color: var(--muted); font-size: 0.76rem; border-top: 1px solid rgba(255,255,255,0.045); }
+.risk-list li::before { content: ""; width: 8px; height: 8px; margin-top: 0.4rem; border-radius: 50%; background: var(--amber); }
+
+.hypothesis-list, .pathway-list { display: grid; gap: 0.65rem; padding: 0.85rem 1rem 1rem; }
+.hypothesis, .pathway { width: 100%; text-align: left; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,0.025); cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease; }
+.hypothesis:hover:not(:disabled), .pathway:hover:not(:disabled) { border-color: var(--line-strong); }
+.hypothesis.is-selected, .pathway.is-selected { border-color: rgba(99, 230, 213, 0.56); background: rgba(99, 230, 213, 0.075); }
+.hypothesis:disabled, .pathway:disabled { cursor: not-allowed; }
+.hypothesis { display: grid; grid-template-columns: 48px 1fr; gap: 0.7rem; padding: 0.75rem; }
+.hypothesis > span { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--cyan); font-size: 0.72rem; font-weight: 900; }
+.hypothesis strong, .hypothesis p, .hypothesis small { display: block; }
+.hypothesis strong { font-size: 0.87rem; }
+.hypothesis p { margin: 0.16rem 0; color: var(--muted); font-size: 0.72rem; }
+.hypothesis small { color: var(--faint); font-size: 0.61rem; }
+.pathway { display: grid; grid-template-columns: 58px 1fr auto; gap: 0.75rem; align-items: center; padding: 0.8rem; }
+.pathway-code { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 12px; background: rgba(99, 230, 213, 0.08); color: var(--cyan); font-size: 0.72rem; font-weight: 900; }
+.pathway strong, .pathway p, .pathway small, .pathway em { display: block; }
+.pathway strong { font-size: 0.85rem; }
+.pathway p { margin: 0.16rem 0; color: var(--muted); font-size: 0.7rem; }
+.pathway small { color: var(--faint); font-size: 0.61rem; }
+.pathway em { color: var(--muted); font-size: 0.64rem; font-style: normal; text-align: right; }
+.pathway-summary { margin: 0 1rem 1rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(0,0,0,0.12); color: var(--muted); font-size: 0.72rem; }
+.pathway-summary strong { color: var(--text); }
+
+.test-options { display: grid; gap: 0.5rem; padding: 0.85rem 1rem; }
+.test-option { display: grid; grid-template-columns: auto 1fr; gap: 0.65rem; align-items: start; padding: 0.65rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.02); }
+.test-option input { width: 20px; height: 20px; margin-top: 0.2rem; accent-color: var(--cyan-strong); }
+.test-option strong, .test-option p, .test-option small { display: block; }
+.test-option strong { font-size: 0.8rem; }
+.test-option p { margin: 0.1rem 0; color: var(--muted); font-size: 0.68rem; }
+.test-option small { color: var(--faint); font-size: 0.6rem; }
+.timeline-scroll { overflow-x: auto; border-top: 1px solid var(--line); scrollbar-color: var(--line-strong) transparent; }
+.timeline { min-width: 840px; display: grid; grid-template-columns: repeat(9, 1fr); padding: 0.85rem 0.8rem 1rem; }
+.timeline-week { min-width: 0; position: relative; padding: 0.45rem 0.45rem 0.6rem; border-left: 1px solid var(--line); }
+.timeline-week:last-child { border-right: 1px solid var(--line); }
+.timeline-week::before { content: ""; position: absolute; top: 22px; left: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.timeline-week.is-current { background: rgba(99, 230, 213, 0.055); }
+.timeline-week.is-current::before { background: var(--cyan); box-shadow: 0 0 14px rgba(99,230,213,0.7); }
+.timeline-week strong { display: block; color: var(--muted); font-size: 0.68rem; }
+.timeline-event { margin-top: 0.45rem; padding: 0.38rem 0.4rem; border-radius: 7px; background: rgba(255,255,255,0.045); color: #cfe2df; font-size: 0.58rem; line-height: 1.35; }
+.timeline-event.research { color: #c8d8ff; background: rgba(131,185,255,0.08); }
+.timeline-event.clinical { color: #bbf1dc; background: rgba(100,211,168,0.08); }
+
+.prediction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; padding: 0.85rem 1rem; }
+.prediction { min-height: 84px; text-align: left; padding: 0.65rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.025); cursor: pointer; }
+.prediction.is-selected { border-color: rgba(99, 230, 213, 0.55); background: rgba(99,230,213,0.07); }
+.prediction span, .prediction strong { display: block; }
+.prediction span { color: var(--faint); font-size: 0.6rem; text-transform: uppercase; }
+.prediction strong { margin-top: 0.22rem; font-size: 0.77rem; }
+.forecast { margin: 0 1rem 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; }
+.forecast-item { padding: 0.65rem; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,0.12); }
+.forecast-item span, .forecast-item strong { display: block; }
+.forecast-item span { color: var(--faint); font-size: 0.59rem; }
+.forecast-item strong { margin-top: 0.2rem; font-size: 0.72rem; }
+
+.event-head { align-items: flex-start; }
+.filter-group { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.filter-group button, .layer-tabs button { min-height: 30px; padding: 0.25rem 0.48rem; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--faint); cursor: pointer; font-size: 0.58rem; }
+.filter-group button.is-active, .layer-tabs button.is-active { border-color: rgba(99,230,213,0.45); background: rgba(99,230,213,0.08); color: var(--cyan); }
+.event-list { max-height: 560px; overflow: auto; padding: 0.35rem 1rem 1rem; }
+.event-item { display: grid; grid-template-columns: 52px 10px 1fr; gap: 0.55rem; padding: 0.72rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.event-item > time { color: var(--faint); font-size: 0.62rem; }
+.event-dot { width: 9px; height: 9px; margin-top: 0.38rem; border-radius: 50%; background: var(--mechanism); }
+.event-item[data-type="clinical"] .event-dot { background: var(--clinical); }
+.event-item[data-type="research"] .event-dot { background: var(--research); }
+.event-item strong, .event-item p { display: block; }
+.event-item strong { font-size: 0.75rem; }
+.event-item p { margin: 0.12rem 0 0; color: var(--muted); font-size: 0.67rem; }
+.empty-state { color: var(--muted); }
+
+.ecology-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.7fr); gap: 1rem; align-items: start; }
+.map-panel canvas { width: 100%; height: min(66vh, 700px); display: block; background: radial-gradient(circle at 50% 50%, #112a2f, #061214 78%); cursor: crosshair; }
+.layer-tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.region-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.75rem 1rem 1rem; border-top: 1px solid var(--line); }
+.region-buttons button { min-height: 38px; padding: 0.35rem 0.62rem; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,0.025); color: var(--muted); cursor: pointer; font-size: 0.65rem; }
+.region-buttons button.is-selected { border-color: var(--cyan); color: var(--cyan); }
+.inspector-panel { position: sticky; top: calc(var(--topbar) + 1rem); }
+.inspector-grid { display: grid; gap: 0.55rem; }
+.inspector-grid div { padding: 0.6rem; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); }
+.inspector-grid span, .inspector-grid strong { display: block; }
+.inspector-grid span { color: var(--faint); font-size: 0.61rem; }
+.inspector-grid strong { margin-top: 0.15rem; font-size: 0.77rem; }
+.notice { margin: 0.85rem 1rem 1rem; display: flex; gap: 0.55rem; align-items: flex-start; padding: 0.7rem; border: 1px solid rgba(240,195,107,0.25); border-radius: 10px; background: rgba(240,195,107,0.055); font-size: 0.68rem; }
+.notice b { color: var(--amber); white-space: nowrap; }
+.notice span { color: var(--muted); }
+
+.evidence-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.evidence-card { min-width: 0; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(17,39,43,0.95), rgba(8,24,28,0.95)); }
+.evidence-card header { display: grid; grid-template-columns: 48px 1fr; gap: 0.7rem; align-items: center; }
+.evidence-card header > span { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 11px; color: var(--cyan); font-weight: 900; }
+.evidence-card h3 { margin: 0; font-size: 0.92rem; }
+.evidence-card header p { margin: 0.1rem 0 0; color: var(--muted); font-size: 0.68rem; }
+.evidence-card dl { margin: 0.8rem 0 0; }
+.evidence-card dl div { padding: 0.6rem 0; border-top: 1px solid var(--line); }
+.evidence-card dt { color: var(--faint); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
+.evidence-card dd { margin: 0.15rem 0 0; color: #d4e4e1; font-size: 0.71rem; }
+.evidence-card footer { margin-top: 0.7rem; }
+.evidence-card footer a { font-size: 0.65rem; font-weight: 800; }
+
+.compare-empty { padding: 1.5rem; }
+.compare-empty h3 { margin: 0; }
+.compare-empty p { margin: 0.4rem 0 0; color: var(--muted); }
+.compare-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.compare-card { padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(17,39,43,0.95), rgba(8,24,28,0.95)); }
+.compare-card.is-current { border-color: rgba(99,230,213,0.52); }
+.compare-card h3 { margin: 0; font-size: 0.95rem; }
+.compare-card > p { color: var(--muted); font-size: 0.68rem; }
+.dimension-list { display: grid; gap: 0.55rem; margin-top: 0.8rem; }
+.dimension { padding: 0.65rem; border: 1px solid var(--line); border-radius: 10px; }
+.dimension span, .dimension strong, .dimension small { display: block; }
+.dimension span { color: var(--faint); font-size: 0.59rem; }
+.dimension strong { margin-top: 0.12rem; font-size: 0.75rem; }
+.dimension small { margin-top: 0.15rem; color: var(--muted); font-size: 0.62rem; }
+
+.app-footer { margin-left: var(--nav); min-height: 62px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1.4rem; border-top: 1px solid var(--line); color: var(--faint); font-size: 0.66rem; }
+.app-footer a { color: var(--muted); }
+
+.modal { width: min(94vw, 760px); max-height: 88vh; padding: 0; border: 1px solid var(--line-strong); border-radius: var(--radius); background: #0b2024; color: var(--text); box-shadow: var(--shadow); }
+.modal.wide { width: min(94vw, 1120px); }
+.modal::backdrop { background: rgba(0, 5, 7, 0.76); backdrop-filter: blur(7px); }
+.modal-frame { display: flex; flex-direction: column; max-height: 88vh; }
+.modal header, .modal footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.85rem 1rem; }
+.modal header { border-bottom: 1px solid var(--line); }
+.modal footer { border-top: 1px solid var(--line); }
+.modal h2 { margin: 0; font-size: 1.35rem; }
+.modal-content { overflow: auto; padding: 1rem; }
+.modal footer { justify-content: flex-end; }
+.method-grid, .recap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.method-grid > div, .recap-card { padding: 0.8rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,0.025); }
+.method-grid b, .recap-card strong { color: var(--cyan); }
+.method-grid p, .recap-card p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.72rem; }
+.prediction-review { margin-top: 0.8rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: 11px; }
+.prediction-review h3 { margin: 0 0 0.55rem; font-size: 0.9rem; }
+.prediction-result { display: flex; justify-content: space-between; gap: 0.7rem; padding: 0.4rem 0; color: var(--muted); font-size: 0.69rem; border-top: 1px solid rgba(255,255,255,0.05); }
+.prediction-result b.supported { color: var(--clinical); }
+.prediction-result b.not-supported { color: var(--amber); }
+.settings-list { display: grid; gap: 0.65rem; }
+.settings-list label { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem; border: 1px solid var(--line); border-radius: 11px; }
+.settings-list strong, .settings-list small { display: block; }
+.settings-list small { margin-top: 0.1rem; color: var(--muted); font-size: 0.65rem; }
+.settings-list select { min-width: 130px; padding: 0.45rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--text); }
+.settings-list input[type="checkbox"] { width: 23px; height: 23px; accent-color: var(--cyan-strong); }
+.save-toolbar { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.file-button { position: relative; overflow: hidden; cursor: pointer; }
+.file-button input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.save-list { display: grid; gap: 0.6rem; margin-top: 1rem; }
+.save-record { display: grid; grid-template-columns: 1fr auto; gap: 0.7rem; align-items: center; padding: 0.75rem; border: 1px solid var(--line); border-radius: 11px; }
+.save-record strong, .save-record small { display: block; }
+.save-record small { color: var(--muted); font-size: 0.64rem; }
+.save-record-actions { display: flex; gap: 0.4rem; }
+.save-record-actions button { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.62rem; }
+
+.toast-region { position: fixed; z-index: 300; right: 1rem; bottom: 1rem; width: min(360px, calc(100vw - 2rem)); display: grid; gap: 0.55rem; }
+.toast { padding: 0.75rem 0.85rem; border: 1px solid var(--line-strong); border-radius: 11px; background: rgba(10, 31, 35, 0.96); box-shadow: var(--shadow); }
+.toast strong, .toast span { display: block; }
+.toast strong { font-size: 0.76rem; }
+.toast span { margin-top: 0.12rem; color: var(--muted); font-size: 0.66rem; }
+.update-banner { position: fixed; z-index: 260; left: 50%; bottom: 1rem; transform: translateX(-50%); display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0.9rem; border: 1px solid var(--line-strong); border-radius: 12px; background: #102d31; box-shadow: var(--shadow); font-size: 0.7rem; }
+.update-banner button { border: 0; border-radius: 8px; background: var(--cyan); color: #05201c; padding: 0.4rem 0.65rem; cursor: pointer; font-weight: 850; }
+.noscript { position: fixed; inset: auto 0 0; z-index: 999; padding: 1rem; background: #7c2f2b; color: white; text-align: center; }
+
+@media (max-width: 1450px) {
+  .status-strip div { min-width: 104px; }
+  .evidence-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 1250px) {
+  .landing-main { grid-template-columns: 1fr; }
+  .landing-copy { padding-top: 2rem; }
+  .landing-visual { min-height: 480px; }
+  .topbar { grid-template-columns: minmax(230px,1fr) auto; }
+  .status-strip { display: none; }
+  .command-grid { grid-template-columns: 1fr; grid-template-areas: "case" "hypothesis" "pathway" "evidence" "prediction" "events"; }
+  .compare-board { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  :root { --topbar: 76px; --nav: 0px; }
+  .landing-header, .landing-footer, .landing-main { width: min(100% - 1.5rem, var(--content-max)); }
+  .landing-header { min-height: 76px; }
+  .landing-links a { display: none; }
+  .landing-main { padding-top: 1rem; }
+  .landing-copy h1 { font-size: clamp(2.7rem, 13vw, 5rem); }
+  .landing-visual { min-height: 390px; }
+  .topbar { padding: 0 0.7rem; }
+  .compact-brand small { display: none; }
+  .top-actions { gap: 0.25rem; }
+  .icon-button { min-width: 42px; padding: 0 0.5rem; }
+  .side-nav { top: auto; right: 0; bottom: 0; width: auto; height: 72px; flex-direction: row; padding: 0.35rem; border-right: 0; border-top: 1px solid var(--line); }
+  .nav-button { flex: 1; min-height: 60px; }
+  .workspace { margin-left: 0; padding: calc(var(--topbar) + 1rem) 0.75rem 6rem; }
+  .app-footer { margin-left: 0; padding-bottom: 5.2rem; flex-direction: column; align-items: flex-start; }
+  .view-head { min-height: 0; flex-direction: column; }
+  .view-actions { width: 100%; }
+  .view-actions .button { flex: 1; }
+  .progress-rail { grid-template-columns: repeat(5, 130px); overflow-x: auto; padding-bottom: 0.3rem; }
+  .fact-grid, .forecast, .prediction-grid, .method-grid, .recap-grid, .evidence-grid { grid-template-columns: 1fr; }
+  .ecology-layout { grid-template-columns: 1fr; }
+  .inspector-panel { position: static; }
+  .map-panel canvas { height: 55vh; }
+  .modal footer { flex-direction: column; align-items: stretch; }
+  .modal footer .button { width: 100%; }
+}
+
+@media (max-width: 620px) {
+  .brand-mark { width: 40px; height: 40px; }
+  .brand strong { font-size: 0.83rem; }
+  .landing-copy h1 { letter-spacing: -0.045em; }
+  .landing-lead { font-size: 1.05rem; }
+  .landing-actions .button { width: 100%; }
+  .boundary-strip { grid-template-columns: 1fr; }
+  .landing-footer { align-items: flex-start; flex-direction: column; justify-content: center; }
+  .top-actions #installButton { display: none; }
+  .panel-head { align-items: flex-start; }
+  .panel-head > div { align-items: flex-start; }
+  .pathway { grid-template-columns: 52px 1fr; }
+  .pathway em { grid-column: 2; text-align: left; }
+  .event-item { grid-template-columns: 45px 9px 1fr; }
+  .toast-region { bottom: 5rem; }
+  .update-banner { bottom: 5rem; width: calc(100vw - 1.5rem); }
+  .save-record { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .topbar, .side-nav, .view-actions, .app-footer, .toast-region, .update-banner { display: none !important; }
+  .workspace { margin: 0; padding: 1cm; }
+  body { background: white; color: black; }
+  .panel, .evidence-card, .compare-card { break-inside: avoid; background: white; box-shadow: none; border-color: #888; }
+}
+
+.static-page { min-height: 100vh; }
+.static-header { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1rem; border-bottom: 1px solid var(--line); background: rgba(5,17,20,.92); }
+.static-header .brand-mark { width: 40px; height: 40px; }
+.static-header nav { display: flex; flex-wrap: wrap; gap: .8rem; }
+.static-header nav a { color: var(--muted); font-size: .72rem; font-weight: 750; text-decoration: none; }
+.static-main { width: min(100% - 2rem, 980px); margin: 0 auto; padding: 3rem 0 5rem; }
+.static-main h1 { margin: 0; font-size: clamp(2.2rem,5vw,4.4rem); line-height: 1.05; letter-spacing: -.04em; }
+.static-main h2 { margin: 2.2rem 0 .6rem; font-size: 1.35rem; }
+.static-main h3 { margin: 1.5rem 0 .4rem; font-size: 1rem; }
+.static-main p, .static-main li { color: #c7d8d5; }
+.static-main li { margin: .35rem 0; }
+.static-lead { font-size: 1.05rem; color: var(--muted) !important; }
+.static-card { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(15,38,42,.8); }
+.static-card h2, .static-card h3 { margin-top: 0; }
+.reference-list { display: grid; gap: .8rem; margin-top: 1rem; }
+.reference-item { padding: .9rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
+.reference-item strong, .reference-item span, .reference-item a { display: block; }
+.reference-item span { margin-top: .15rem; color: var(--muted); font-size: .72rem; }
+.reference-item a { margin-top: .45rem; overflow-wrap: anywhere; font-size: .68rem; }
+.static-footer { padding: 1rem; border-top: 1px solid var(--line); color: var(--faint); text-align: center; font-size: .65rem; }
+@media (max-width:620px){.static-header{align-items:flex-start;flex-direction:column;padding:.8rem}.static-main{padding-top:2rem}.static-header nav{gap:.55rem}}
+
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">跳到主要内容</a>
+
+  <section class="boot-screen" id="bootScreen" aria-live="polite">
+    <div class="boot-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1>正在载入病例内容</h1>
+    <p id="bootMessage">验证内容版本、存档与模拟引擎……</p>
+  </section>
+
+  <section class="fatal-screen is-hidden" id="fatalScreen" role="alert">
+    <div class="fatal-card">
+      <p class="eyebrow">无法安全启动</p>
+      <h1>内容或运行环境出现问题</h1>
+      <p id="fatalMessage">请重新载入页面。</p>
+      <div class="button-row">
+        <button class="button primary" id="reloadButton">重新载入</button>
+        <button class="button secondary" id="clearRecoveryButton">清除本地恢复数据</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing is-hidden" id="landing" aria-labelledby="landingTitle">
+    <div class="landing-noise" aria-hidden="true"></div>
+    <header class="landing-header">
+      <a class="brand" href="#" aria-label="返回首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>肠境：免疫围城</strong><small>CRC Immune Frontier</small></span>
+      </a>
+      <div class="landing-links">
+        <a href="#" title="完整项目中提供该说明页面">方法与边界</a>
+        <a href="#" title="完整项目中提供该说明页面">证据来源</a>
+        <button class="text-button" id="landingTextButton" type="button" aria-label="调整字号">字号</button>
+      </div>
+    </header>
+
+    <main class="landing-main">
+      <div class="landing-copy">
+        <p class="eyebrow">v1.0.0 · Public Preview</p>
+        <h1 id="landingTitle">检测有限，时间有限，<em>毒性有限。</em></h1>
+        <p class="landing-lead">你无法命令免疫细胞。你只能在不完整证据下提出假设、选择受约束的治疗路径，并判断短期控制是否掩盖了生态风险。</p>
+        <div class="button-row landing-actions">
+          <button class="button primary large" id="newCaseButton">开始新病例</button>
+          <button class="button secondary large is-hidden" id="continueCaseButton">继续本地病例</button>
+        </div>
+        <div class="boundary-strip" role="note">
+          <strong>教育与游戏用途</strong>
+          <span>不对应真实患者，不提供剂量、处方或疗效预测，也不能替代指南、MDT 或临床试验。</span>
+        </div>
+      </div>
+
+      <div class="landing-visual" aria-label="抽象肿瘤生态示意图">
+        <canvas id="landingCanvas" width="760" height="620"></canvas>
+        <div class="visual-caption"><span>●</span> 代表性生态剖面 · 非真实病理图像</div>
+      </div>
+    </main>
+
+    <footer class="landing-footer">
+      <span id="contentBaseline">医学内容基线：载入中</span>
+      <span>本地优先 · 无广告 · 无跟踪器</span>
+    </footer>
+  </section>
+
+  <div class="app-shell is-hidden" id="appShell">
+    <header class="topbar">
+      <a class="brand compact-brand" href="#" id="homeLink">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>肠境：免疫围城</strong><small>v1.0.0 · Public Preview</small></span>
+      </a>
+      <div class="status-strip" aria-label="病例状态">
+        <div><span>节点</span><strong id="weekMetric">W0</strong></div>
+        <div><span>路径</span><strong id="pathMetric">未提交</strong></div>
+        <div><span>存档</span><strong id="saveMetric">准备中</strong></div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="installButton" type="button" hidden>安装</button>
+        <button class="icon-button" id="textScaleButton" type="button" aria-label="调整字号">A+</button>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="打开设置">设置</button>
+        <button class="icon-button" id="saveButton" type="button" aria-label="打开存档管理">存档</button>
+      </div>
+    </header>
+
+    <nav class="side-nav" aria-label="主要导航">
+      <button class="nav-button is-active" data-view="command"><span aria-hidden="true">⌁</span><b>指挥</b></button>
+      <button class="nav-button" data-view="ecology"><span aria-hidden="true">◉</span><b>生态</b></button>
+      <button class="nav-button" data-view="evidence"><span aria-hidden="true">▦</span><b>证据</b></button>
+      <button class="nav-button" data-view="compare"><span aria-hidden="true">⇄</span><b>比较</b></button>
+    </nav>
+
+    <main class="workspace" id="mainContent" tabindex="-1">
+      <section class="view is-active" id="view-command" aria-labelledby="commandTitle">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow" id="caseEyebrow">病例载入中</p>
+            <h2 id="commandTitle" tabindex="-1">病例指挥视图</h2>
+            <p id="caseSubtitle" class="view-subtitle"></p>
+          </div>
+          <div class="view-actions">
+            <button class="button secondary" id="methodButton">方法与边界</button>
+            <button class="button primary" id="advanceButton">提交计划并推进到 W2</button>
+          </div>
+        </div>
+
+        <div class="progress-rail" id="progressRail" aria-label="病例进度"></div>
+
+        <div class="command-grid">
+          <article class="panel case-panel">
+            <header class="panel-head"><div><span class="panel-index">A</span><h3>病例简报</h3></div><span class="badge clinical">虚构病例</span></header>
+            <div class="panel-body" id="caseBrief"></div>
+          </article>
+
+          <article class="panel hypothesis-panel">
+            <header class="panel-head"><div><span class="panel-index">B</span><h3>机制假设板</h3></div><span class="badge" id="hypothesisCount">1 / 3</span></header>
+            <p class="panel-note">选择 1–3 项当前最值得关注的瓶颈。暂停节点可修订，系统不会替你标出“正确答案”。</p>
+            <div class="hypothesis-list" id="hypothesisList"></div>
+          </article>
+
+          <article class="panel pathway-panel">
+            <header class="panel-head"><div><span class="panel-index">C</span><h3>治疗路径</h3></div><span class="badge clinical">固定模板</span></header>
+            <p class="panel-note">提交后路径锁定。游戏不显示真实剂量，也不允许逐日自由组合真实药物。</p>
+            <div class="pathway-list" id="pathwayList" role="radiogroup" aria-label="治疗路径"></div>
+            <div class="pathway-summary" id="pathwaySummary"></div>
+          </article>
+
+          <article class="panel evidence-plan-panel">
+            <header class="panel-head"><div><span class="panel-index">D</span><h3>证据与时间轴</h3></div><span class="badge research">临床 / 研究分层</span></header>
+            <div class="test-options" id="testOptions"></div>
+            <div class="timeline-scroll" tabindex="0" aria-label="横向滚动查看八周时间轴"><div class="timeline" id="timeline"></div></div>
+          </article>
+
+          <article class="panel prediction-panel">
+            <header class="panel-head"><div><span class="panel-index">E</span><h3>方向性预测</h3></div><span class="badge">预测承诺</span></header>
+            <p class="panel-note">提交前至少选择一项。复盘只比较方向是否被支持，不给出虚假精确概率。</p>
+            <div class="prediction-grid" id="predictionGrid"></div>
+            <div class="forecast" id="forecast"></div>
+          </article>
+
+          <article class="panel event-panel">
+            <header class="panel-head event-head"><div><span class="panel-index">F</span><h3>事件与推理记录</h3></div><div class="filter-group" aria-label="事件筛选"><button class="is-active" data-filter="all">全部</button><button data-filter="clinical">临床</button><button data-filter="research">研究</button><button data-filter="mechanism">机制</button></div></header>
+            <div class="event-list" id="eventList" aria-live="polite"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="view-ecology" aria-labelledby="ecologyTitle">
+        <div class="view-head"><div><p class="eyebrow">地图是证据，不是战场</p><h2 id="ecologyTitle" tabindex="-1">代表性生态剖面</h2><p class="view-subtitle">地图帮助解释空间接触、呈递与取样偏差；所有关键决策仍在指挥视图完成。</p></div></div>
+        <div class="ecology-layout">
+          <article class="panel map-panel">
+            <header class="panel-head"><div><span class="panel-index">M</span><h3>空间图层</h3></div><div class="layer-tabs"><button class="is-active" data-layer="cells">细胞</button><button data-layer="presentation">MHC-I</button><button data-layer="contact">CD8 接触</button><button data-layer="perfusion">灌注</button></div></header>
+            <canvas id="ecologyCanvas" width="960" height="600" tabindex="0" aria-label="抽象肿瘤生态地图。使用左右方向键切换代表区域，按回车查看。"></canvas>
+            <div class="region-buttons" id="regionButtons" aria-label="代表区域快捷选择"></div>
+          </article>
+          <aside class="panel inspector-panel">
+            <header class="panel-head"><div><span class="panel-index">I</span><h3>局部证据</h3></div></header>
+            <div class="panel-body" id="regionInspector"><p class="empty-state">选择一个代表区域查看局部证据。</p></div>
+            <div class="notice"><b>解释限制</b><span>代表性切片不能直接推断全病灶，也不能据此给出临床治疗建议。</span></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-evidence" aria-labelledby="evidenceTitle">
+        <div class="view-head"><div><p class="eyebrow">同一句话，可能来自不同证据层</p><h2 id="evidenceTitle" tabindex="-1">临床状态、机制证据与游戏抽象</h2><p class="view-subtitle">每项主张都显示用途边界和来源；内容基线以页面底部日期为准。</p></div></div>
+        <div class="evidence-grid" id="evidenceGrid"></div>
+      </section>
+
+      <section class="view" id="view-compare" aria-labelledby="compareTitle">
+        <div class="view-head"><div><p class="eyebrow">同种子教学性反事实</p><h2 id="compareTitle" tabindex="-1">按三维比较路径，而不是寻找总分最高</h2><p class="view-subtitle">比较使用相同隐藏病例种子，但仍是模型内反事实，不是临床疗效比较。</p></div></div>
+        <div class="panel compare-empty" id="compareEmpty"><h3>完成 W8 评估后开放</h3><p>系统将并列当前路径与另外两条路径，解释疾病控制、生态风险和治疗可持续性。</p></div>
+        <div class="compare-board is-hidden" id="compareBoard"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span id="footerVersion">内容载入中</span>
+      <span><a href="#" title="完整项目中提供该说明页面">隐私</a> · <a href="#" title="完整项目中提供该说明页面">可访问性</a> · <a href="#" title="完整项目中提供该说明页面">参考资料</a></span>
+    </footer>
+  </div>
+
+  <dialog class="modal" id="eventDialog" aria-labelledby="eventDialogTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow" id="eventDialogLabel">关键节点</p><h2 id="eventDialogTitle">证据返回</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content" id="eventDialogBody"></div>
+      <footer><button class="button primary" value="close">返回并重新判断</button><button class="button secondary" value="evidence" id="eventEvidenceButton">查看证据卡</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal wide" id="recapDialog" aria-labelledby="recapDialogTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">W8 综合复盘</p><h2 id="recapDialogTitle">结果需要按三维解释</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content"><div class="recap-grid" id="recapGrid"></div><div class="prediction-review" id="predictionReview"></div></div>
+      <footer><button class="button primary" value="compare">查看路径比较</button><button class="button secondary" value="close">留在指挥视图</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="settingsDialog" aria-labelledby="settingsTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">显示与运行设置</p><h2 id="settingsTitle">设置</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content settings-list">
+        <label><span><strong>界面字号</strong><small>桌面默认已经放大；可再选择更大。</small></span><select id="textScaleSelect"><option value="normal">舒适</option><option value="large">大</option><option value="xlarge">特大</option></select></label>
+        <label><span><strong>高对比度</strong><small>增强边框和文字层级。</small></span><input type="checkbox" id="contrastToggle"></label>
+        <label><span><strong>减少动态</strong><small>关闭装饰动画和大部分过渡。</small></span><input type="checkbox" id="motionToggle"></label>
+        <label><span><strong>自动保存</strong><small>每个暂停节点保存到浏览器本地。</small></span><input type="checkbox" id="autosaveToggle" checked></label>
+      </div>
+      <footer><button class="button primary" value="close">完成</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal wide" id="saveDialog" aria-labelledby="saveTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">本地优先、可导出</p><h2 id="saveTitle">存档管理</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content">
+        <div class="save-toolbar"><button class="button primary" type="button" id="manualSaveButton">保存到自动槽</button><button class="button secondary" type="button" id="exportSaveButton">导出存档</button><label class="button secondary file-button">导入存档<input type="file" id="importSaveInput" accept="application/json"></label></div>
+        <div class="save-list" id="saveList"></div>
+        <div class="notice"><b>隐私</b><span>默认存档只保存在本机浏览器。项目不包含账号、广告、第三方分析或自动云上传。</span></div>
+      </div>
+      <footer><button class="button danger" type="button" id="resetCaseButton">重置当前病例</button><button class="button secondary" value="close">关闭</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="methodDialog" aria-labelledby="methodTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">科学与游戏性的边界</p><h2 id="methodTitle">压缩时间，不伪造临床流程</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content method-grid">
+        <div><b>临床事实</b><p>适应证、方案结构和重要毒性受公开证据约束。</p></div>
+        <div><b>机制证据</b><p>用方向性关系表达，不把相关性写成必然因果。</p></div>
+        <div><b>游戏抽象</b><p>八周被压缩为短局，Web Worker 内部使用隐藏六小时 tick。</p></div>
+        <div><b>禁止误导</b><p>不显示真实剂量、不允许任意联合、不生成患者建议。</p></div>
+      </div>
+      <footer><a class="button secondary" href="#" title="完整项目中提供该说明页面">阅读完整说明</a><button class="button primary" value="close">了解</button></footer>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="update-banner is-hidden" id="updateBanner" role="status"><span>发现新版本。完成当前操作后可安全刷新。</span><button id="updateButton">刷新更新</button></div>
+
+  <noscript><div class="noscript">本游戏需要 JavaScript 才能运行。静态方法、隐私和参考资料页面仍可访问。</div></noscript>
+<script>window.__CRC_EMBEDDED_CONTENT__={"manifest":{"schemaVersion":1,"contentVersion":"2026.08.01","appVersion":"1.0.0","status":"public-preview","defaultLocale":"zh-CN","medicalBaseline":"2026-08-01","cases":["cases/case-b2m-escape.json"],"pathways":"pathways.json","evidence":"evidence.json"},"caseData":{"schemaVersion":1,"id":"case-b2m-escape","title":"响应背后的异质性","subtitle":"MSI-H/dMMR 结直肠癌中的抗原呈递不确定性","durationMinutes":"20–30","seed":2101,"assessmentWeek":8,"clinicalFrame":{"disease":"不可切除或转移性结直肠癌（教学性虚构病例）","known":["MSI-H / dMMR 已确认","基线影像可测量病灶","既往治疗与合并症被简化"],"unknown":["B2M / MHC-I 异质性","有效 CD8 接触","低频克隆的纵向变化"],"disclaimer":"病例不对应真实患者，不提供治疗建议，也不模拟真实剂量。"},"hypotheses":[{"id":"presentation","name":"抗原呈递异质性","summary":"局部 B2M/MHC-I 改变可能降低部分 CD8 识别，但不等于必然免疫失败。","evidenceTier":"临床观察 + 转化研究"},{"id":"exhaustion","name":"可逆疲惫仍占主导","summary":"若可逆疲惫群体仍存在，检查点阻断可能恢复部分效应。","evidenceTier":"机制与临床一致性"},{"id":"spatial","name":"有效接触不足","summary":"总浸润不等于有效接触，间质、灌注与局部呈递共同影响杀伤。","evidenceTier":"转化与前临床"},{"id":"selection","name":"治疗选择正在改变克隆构成","summary":"优势克隆下降时，低频逃逸克隆的相对比例可能上升。","evidenceTier":"生态模型 / 需纵向证据"}],"tests":[{"id":"ctdna","name":"ctDNA 研究性趋势","collectWeek":0,"returnWeek":2,"classification":"research","limitations":["低释放可导致假阴性","不能单独决定换药","只输出检出状态、趋势与置信度"]},{"id":"b2m","name":"B2M / MHC-I 组织面板","collectWeek":0,"returnWeek":2,"classification":"translational","limitations":["仅代表取样区域","基因、蛋白与表面表达可能不一致","不是常规实时监测标准"]},{"id":"imaging","name":"分类影像评估","collectWeek":8,"returnWeek":8,"classification":"clinical","limitations":["游戏不模拟 RECIST 尺寸测量","免疫路径的疑似进展不自动等于确认进展"]}],"predictions":[{"id":"disease_control","label":"W8 获得疾病控制","dimension":"disease"},{"id":"ecology_risk","label":"呈递异质性风险上升","dimension":"ecology"},{"id":"ctdna_uncertain","label":"ctDNA 仍不足以下定论","dimension":"evidence"},{"id":"toxicity","label":"出现需要处理的毒性","dimension":"treatment"}]},"pathways":{"schemaVersion":1,"pathways":[{"id":"pembro","name":"Pembrolizumab-like 单药","shortName":"PD-1 单药","clinicalStatus":"FDA 已批准用于不可切除或转移性 MSI-H/dMMR CRC 的一线治疗","gameBoundary":"按 q3w-like 固定节点抽象；不显示剂量，也不替代处方信息。","schedule":[{"week":0,"label":"PD-1 周期 1"},{"week":3,"label":"PD-1 周期 2"},{"week":6,"label":"PD-1 周期 3"},{"week":8,"label":"首次分类影像评估"}],"mechanism":["解除部分 PD-1/PD-L1 抑制","依赖抗原呈递、T 细胞到达与非终末耗竭状态"],"risks":["免疫相关不良事件","部分病例原发或继发耐药"],"model":{"immunePressure":0.76,"cytotoxicPressure":0.08,"marrowRisk":0.08,"iraeRisk":0.24,"neuropathyRisk":0}},{"id":"nivoipi","name":"Nivolumab-like + Ipilimumab-like","shortName":"双免疫","clinicalStatus":"FDA 于 2025-04-08 批准用于不可切除或转移性 MSI-H/dMMR CRC","gameBoundary":"按 q3w-like 诱导节点抽象；8 周局内尚未进入完整维持阶段。","schedule":[{"week":0,"label":"双免疫诱导 1"},{"week":3,"label":"双免疫诱导 2"},{"week":6,"label":"双免疫诱导 3"},{"week":8,"label":"首次分类影像评估"}],"mechanism":["增加启动广度","增强现有效应 T 细胞功能"],"risks":["较高免疫相关不良事件风险","抗原呈递缺失或空间排斥仍可导致失败"],"model":{"immunePressure":0.88,"cytotoxicPressure":0.06,"marrowRisk":0.08,"iraeRisk":0.48,"neuropathyRisk":0}},{"id":"folfoxbev","name":"mFOLFOX6-like + Bevacizumab-like","shortName":"化疗 + 抗 VEGF","clinicalStatus":"含氟尿嘧啶化疗联合 bevacizumab 是 mCRC 的临床方案组成之一","gameBoundary":"按 q2w-like 固定周期抽象；不允许把 bevacizumab-like 作为单独的即时灌注技能。","schedule":[{"week":0,"label":"联合方案周期 1"},{"week":2,"label":"联合方案周期 2"},{"week":4,"label":"联合方案周期 3"},{"week":6,"label":"联合方案周期 4"},{"week":8,"label":"首次分类影像评估"}],"mechanism":["细胞毒压力降低肿瘤负荷","抗 VEGF 改变血管生态与暴露分布"],"risks":["骨髓抑制","累积神经毒性","高血压、出血与血栓等抗 VEGF 风险未完整模拟"],"model":{"immunePressure":0.16,"cytotoxicPressure":0.72,"marrowRisk":0.58,"iraeRisk":0,"neuropathyRisk":0.38}}]},"evidence":{"schemaVersion":1,"accessed":"2026-08-01","items":[{"id":"fda-pembro-crc-2020","title":"FDA approves pembrolizumab for first-line treatment of MSI-H/dMMR colorectal cancer","organization":"U.S. Food and Drug Administration","date":"2020-06-29","url":"https://www.fda.gov/drugs/drug-approvals-and-databases/fda-approves-pembrolizumab-first-line-treatment-msi-hdmmr-colorectal-cancer","supports":["pembrolizumab 一线路径","q3w 或 q6w 标签给药间隔","KEYNOTE-177"]},{"id":"fda-nivo-ipi-crc-2025","title":"FDA approves nivolumab with ipilimumab for unresectable or metastatic MSI-H or dMMR colorectal cancer","organization":"U.S. Food and Drug Administration","date":"2025-04-08","url":"https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-nivolumab-ipilimumab-unresectable-or-metastatic-msi-h-or-dmmr-colorectal-cancer","supports":["双免疫适应证","q3w 诱导后维持的标签结构","CHECKMATE-8HW"]},{"id":"dailymed-bevacizumab","title":"Bevacizumab prescribing information","organization":"DailyMed / U.S. National Library of Medicine","date":"current label reviewed 2026-08-01","url":"https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=bevacizumab","supports":["mCRC 中与静脉氟尿嘧啶类化疗联合","不把抗 VEGF 作为独立即时技能"]},{"id":"irecist-2017","title":"iRECIST: guidelines for response criteria for use in trials testing immunotherapeutics","organization":"RECIST Working Group","date":"2017","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC5648544/","supports":["免疫治疗疑似进展需要后续确认的研究框架","4–8 周确认窗口"]},{"id":"asco-irae-2021","title":"Management of Immune-Related Adverse Events in Patients Treated With Immune Checkpoint Inhibitor Therapy","organization":"American Society of Clinical Oncology","date":"2021","url":"https://pubmed.ncbi.nlm.nih.gov/34724392/","supports":["按器官系统与等级呈现 irAE","观察、暂停和免疫抑制取决于严重度"]},{"id":"b2m-msih-crc","title":"B2M mutation and checkpoint inhibitor outcome in MSI-H colorectal cancer","organization":"JCO Precision Oncology","date":"2019","url":"https://ascopubs.org/doi/10.1200/PO.18.00321","supports":["B2M 异常不是稳定的必然无获益开关","保留响应分布与不确定性"]},{"id":"esmo-ctdna-2022","title":"ESMO recommendations on the use of circulating tumour DNA assays for patients with cancer","organization":"European Society for Medical Oncology","date":"2022","url":"https://pubmed.ncbi.nlm.nih.gov/35809752/","supports":["ctDNA 的假阴性限制","早期动态和耐药监测不应单独指导常规换药"]}]}};window.__CRC_EMBEDDED_WORKER__="(function initSimulationEngine(scope) {\n  'use strict';\n\n  const ENGINE_VERSION = '1.0.0';\n  const TICKS_PER_DAY = 4;\n  const DAYS_PER_WEEK = 7;\n  const MILESTONES = Object.freeze([0, 2, 4, 6, 8]);\n\n  function clamp(value, min, max) {\n    return Math.min(max, Math.max(min, value));\n  }\n\n  function mulberry32(seed) {\n    let a = seed >>> 0;\n    return function random() {\n      a |= 0;\n      a = (a + 0x6D2B79F5) | 0;\n      let t = Math.imul(a ^ (a >>> 15), 1 | a);\n      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;\n      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;\n    };\n  }\n\n  function deriveHiddenTraits(seed) {\n    const rng = mulberry32(seed + 1103);\n    return {\n      b2mAltered: rng() < 0.62,\n      mhcRetained: rng() < 0.48,\n      nkCompensation: rng() < 0.52,\n      spatialBarrier: 0.18 + rng() * 0.46,\n      ctDnaShedding: 0.28 + rng() * 0.62,\n      immuneReserve: 0.48 + rng() * 0.42,\n      iraeSusceptibility: 0.35 + rng() * 0.65,\n      marrowReserve: 0.72 + rng() * 0.25,\n      ifnSignalLoss: rng() < 0.18\n    };\n  }\n\n  function copy(value) {\n    return JSON.parse(JSON.stringify(value));\n  }\n\n  function pathwayById(pathways, pathwayId) {\n    const list = pathways && Array.isArray(pathways.pathways) ? pathways.pathways : [];\n    return list.find((item) => item.id === pathwayId) || list[0];\n  }\n\n  function initializeRun({ caseData, pathways, pathwayId, hypotheses, selectedTests, predictions, seed }) {\n    if (!caseData || !pathways) throw new Error('Missing case or pathway content.');\n    const pathway = pathwayById(pathways, pathwayId);\n    if (!pathway) throw new Error('No valid pathway is available.');\n    const resolvedSeed = Number.isFinite(Number(seed)) ? Number(seed) : Number(caseData.seed) || 2107;\n    const traits = deriveHiddenTraits(resolvedSeed);\n    const escapeBaseline = traits.b2mAltered ? 0.055 : 0.026;\n    const sensitiveBaseline = 1 - escapeBaseline;\n    return {\n      engineVersion: ENGINE_VERSION,\n      caseId: caseData.id,\n      pathwayId: pathway.id,\n      seed: resolvedSeed,\n      currentTick: 0,\n      currentWeek: 0,\n      targetWeek: 0,\n      plan: {\n        hypotheses: [...new Set(hypotheses || [])].slice(0, 3),\n        selectedTests: [...new Set(selectedTests || [])],\n        predictions: [...new Set(predictions || [])]\n      },\n      traits,\n      state: {\n        sensitive: sensitiveBaseline,\n        escape: escapeBaseline,\n        immuneActivity: traits.immuneReserve,\n        reversibleExhaustion: 0.58,\n        immuneExposure: 0,\n        cytotoxicExposure: 0,\n        vascularEffect: 0,\n        perfusion: 0.46,\n        marrow: traits.marrowReserve,\n        neuropathy: 0.02,\n        iraeLoad: 0,\n        iraeEvent: null,\n        contactEfficiency: clamp(0.72 - traits.spatialBarrier * 0.55, 0.25, 0.75),\n        evidence: {},\n        stopped: false\n      },\n      snapshots: [],\n      events: [\n        {\n          week: 0,\n          type: 'clinical',\n          title: '基线已建立',\n          text: 'MSI-H / dMMR 已确认；B2M / MHC-I 状态和空间异质性仍未知。'\n        }\n      ],\n      completed: false,\n      outcome: null\n    };\n  }\n\n  function scheduledAtTick(pathway, tick) {\n    const day = tick / TICKS_PER_DAY;\n    return (pathway.schedule || []).filter((event) => event.week < 8 && Math.abs(day - event.week * DAYS_PER_WEEK) < 0.001);\n  }\n\n  function applyTreatmentPulse(run, pathway, event) {\n    const model = pathway.model || {};\n    if (pathway.id === 'pembro' || pathway.id === 'nivoipi') {\n      run.state.immuneExposure = clamp(run.state.immuneExposure + Number(model.immunePressure || 0.6) * 0.72, 0, 1.5);\n      run.events.push({ week: event.week, type: 'clinical', title: event.label, text: '按固定路径节点执行；游戏不模拟真实剂量。' });\n    } else {\n      run.state.cytotoxicExposure = clamp(run.state.cytotoxicExposure + Number(model.cytotoxicPressure || 0.6), 0, 1.5);\n      run.state.vascularEffect = clamp(run.state.vascularEffect + 0.62, 0, 1.3);\n      run.state.marrow = clamp(run.state.marrow - Number(model.marrowRisk || 0) * 0.13, 0.05, 1);\n      run.state.neuropathy = clamp(run.state.neuropathy + Number(model.neuropathyRisk || 0) * 0.055, 0, 1);\n      run.events.push({ week: event.week, type: 'clinical', title: event.label, text: '联合周期已执行；抗 VEGF 仅作为方案组成影响暴露分布。' });\n    }\n  }\n\n  function tickRun(run, pathway, rng) {\n    const s = run.state;\n    for (const event of scheduledAtTick(pathway, run.currentTick)) applyTreatmentPulse(run, pathway, event);\n\n    s.immuneExposure *= 0.995;\n    s.cytotoxicExposure *= 0.90;\n    s.vascularEffect *= 0.965;\n\n    const perfusionTarget = 0.44 + Math.min(0.16, s.vascularEffect * 0.18) - Math.max(0, s.vascularEffect - 0.95) * 0.14;\n    s.perfusion += (perfusionTarget - s.perfusion) * 0.045;\n    s.perfusion = clamp(s.perfusion, 0.22, 0.72);\n\n    const antigenPresentationSensitive = run.traits.ifnSignalLoss ? 0.36 : 0.78;\n    const antigenPresentationEscape = run.traits.ifnSignalLoss\n      ? 0.09\n      : run.traits.b2mAltered\n        ? (run.traits.mhcRetained ? 0.42 : 0.16)\n        : 0.68;\n    const contact = clamp(s.contactEfficiency * (0.82 + s.perfusion * 0.38), 0.18, 0.92);\n    const exhaustionRecovery = s.immuneExposure * (0.0048 + (run.plan.hypotheses.includes('exhaustion') ? 0.0008 : 0));\n    s.reversibleExhaustion = clamp(s.reversibleExhaustion - exhaustionRecovery + 0.0012, 0.12, 0.88);\n    const immuneFunction = clamp(s.immuneActivity * (1 - s.reversibleExhaustion * 0.58) * (run.traits.ifnSignalLoss ? 0.58 : 1), 0.05, 0.92);\n\n    const immuneKillSensitive = s.immuneExposure * immuneFunction * antigenPresentationSensitive * contact * 0.022;\n    const immuneKillEscape = s.immuneExposure * immuneFunction * antigenPresentationEscape * contact * 0.013;\n    const nkKillEscape = run.traits.nkCompensation * (1 - antigenPresentationEscape) * (0.0016 + s.immuneExposure * 0.0012);\n    const cytotoxicModifier = 0.62 + s.perfusion * 0.68;\n    const chemoKillSensitive = s.cytotoxicExposure * cytotoxicModifier * 0.027;\n    const chemoKillEscape = s.cytotoxicExposure * cytotoxicModifier * 0.021;\n\n    const carrying = 1.55;\n    const total = s.sensitive + s.escape;\n    const density = clamp(1 - total / carrying, -0.45, 1);\n    const sensitiveGrowth = 0.0033 * density;\n    const escapeCost = run.traits.b2mAltered ? 0.00055 : 0.0002;\n    const escapeGrowth = (0.00335 - escapeCost) * density;\n\n    const noiseS = (rng() - 0.5) * 0.0008;\n    const noiseE = (rng() - 0.5) * 0.0008;\n    s.sensitive = Math.max(0.002, s.sensitive * (1 + sensitiveGrowth + noiseS - immuneKillSensitive - chemoKillSensitive));\n    s.escape = Math.max(0.001, s.escape * (1 + escapeGrowth + noiseE - immuneKillEscape - nkKillEscape - chemoKillEscape));\n\n    s.immuneActivity = clamp(s.immuneActivity + s.immuneExposure * 0.0018 - s.cytotoxicExposure * 0.0024 - 0.0005, 0.12, 0.95);\n    const marrowDamage = s.cytotoxicExposure * Number(pathway.model?.marrowRisk || 0) * 0.012;\n    s.marrow = clamp(s.marrow - marrowDamage + (s.cytotoxicExposure < 0.08 ? 0.0018 : 0.00025), 0.05, 1);\n    s.neuropathy = clamp(s.neuropathy + s.cytotoxicExposure * Number(pathway.model?.neuropathyRisk || 0) * 0.0042, 0, 1);\n\n    if (!s.iraeEvent && Number(pathway.model?.iraeRisk || 0) > 0) {\n      s.iraeLoad += s.immuneExposure * Number(pathway.model.iraeRisk) * run.traits.iraeSusceptibility * 0.0038;\n      const trigger = 0.14 + rng() * 0.06;\n      if (s.iraeLoad > trigger) {\n        const selector = rng();\n        s.iraeEvent = selector < 0.22\n          ? { organ: '结肠', grade: 'G2', label: '结肠炎样事件 · G2', action: '暂停并评估处理' }\n          : selector < 0.58\n            ? { organ: '内分泌', grade: 'G1', label: '甲状腺炎样事件 · G1', action: '监测并进行器官特异评估' }\n            : { organ: '皮肤', grade: 'G1', label: '皮疹样事件 · G1', action: '观察并进行支持处理' };\n      }\n    }\n\n    run.currentTick += 1;\n    run.currentWeek = run.currentTick / (TICKS_PER_DAY * DAYS_PER_WEEK);\n  }\n\n  function snapshot(run, week) {\n    const s = run.state;\n    const total = s.sensitive + s.escape;\n    const escapeFraction = s.escape / total;\n    return {\n      week,\n      burdenIndex: Number(total.toFixed(4)),\n      escapeFraction: Number(escapeFraction.toFixed(4)),\n      immuneActivity: Number(s.immuneActivity.toFixed(4)),\n      perfusion: Number(s.perfusion.toFixed(4)),\n      marrow: Number(s.marrow.toFixed(4)),\n      neuropathy: Number(s.neuropathy.toFixed(4)),\n      iraeEvent: s.iraeEvent ? copy(s.iraeEvent) : null\n    };\n  }\n\n  function evidenceAtWeek2(run, rng) {\n    const s = run.state;\n    const total = s.sensitive + s.escape;\n    const escapeFraction = s.escape / total;\n    const evidence = {};\n    if (run.plan.selectedTests.includes('ctdna')) {\n      const detectionProbability = clamp(run.traits.ctDnaShedding * (0.28 + escapeFraction * 5.6), 0.08, 0.94);\n      const detected = rng() < detectionProbability;\n      evidence.ctdna = detected\n        ? {\n            status: '检出相关低水平信号',\n            confidence: detectionProbability > 0.65 ? '中等置信' : '低至中置信',\n            interpretation: '信号支持继续关注克隆异质性，但不能单独决定换药。'\n          }\n        : {\n            status: '未检出明确相关信号',\n            confidence: run.traits.ctDnaShedding < 0.45 ? '低置信' : '中等置信',\n            interpretation: '未检出不能排除低释放或低频克隆造成的假阴性。'\n          };\n    }\n    if (run.plan.selectedTests.includes('b2m')) {\n      const sampleHitsAlteredRegion = run.traits.b2mAltered && rng() < 0.72;\n      evidence.b2m = sampleHitsAlteredRegion\n        ? run.traits.mhcRetained\n          ? {\n              status: '检出 B2M 异常信号；MHC-I 仍部分保留',\n              confidence: '区域性中等置信',\n              interpretation: '结果支持呈递异质性，但不能推断全病灶或必然耐药。'\n            }\n          : {\n              status: '局灶 B2M 蛋白下降并伴 MHC-I 降低',\n              confidence: '区域性中等置信',\n              interpretation: '可能降低部分 CD8 识别；仍需考虑取样偏差与非 CD8 压力。'\n            }\n        : {\n            status: '本次取样未见明确 B2M / MHC-I 缺失',\n            confidence: '有限置信',\n            interpretation: '结果仅代表取样区域，不能排除未取样区域的异质性。'\n          };\n    }\n    run.state.evidence = { ...run.state.evidence, ...evidence };\n    return evidence;\n  }\n\n  function safetyAtWeek4(run) {\n    const s = run.state;\n    let label = '可继续当前路径';\n    let action = '保持监测';\n    if (s.marrow < 0.42) {\n      label = '血液学耐受需要调整';\n      action = '游戏内建议延迟下一周期；不对应真实临床阈值';\n    }\n    if (s.iraeEvent?.grade === 'G2') {\n      label = s.iraeEvent.label;\n      action = s.iraeEvent.action;\n    } else if (s.iraeEvent) {\n      label = s.iraeEvent.label;\n      action = s.iraeEvent.action;\n    }\n    return { label, action, marrowBand: s.marrow >= 0.68 ? '充足' : s.marrow >= 0.42 ? '下降' : '明显下降' };\n  }\n\n  function finalOutcome(run, pathway) {\n    const initial = run.snapshots.find((item) => item.week === 0) || { burdenIndex: 1 };\n    const latest = snapshot(run, 8);\n    const ratio = latest.burdenIndex / initial.burdenIndex;\n    const immunePathway = pathway.id !== 'folfoxbev';\n    let imaging;\n    if (ratio <= 0.72) imaging = '明确控制';\n    else if (ratio <= 1.08) imaging = '基本稳定';\n    else imaging = immunePathway ? '疑似进展（临床稳定时需后续确认）' : '进展趋势';\n\n    const initialEscape = initial.escapeFraction || 0.04;\n    const escapeChange = latest.escapeFraction - initialEscape;\n    let ecology;\n    if (escapeChange > 0.11) ecology = '生态风险上升';\n    else if (escapeChange > 0.035 || run.state.evidence.b2m) ecology = '仍有不确定性';\n    else ecology = '风险相对较低';\n\n    let sustainability = '可持续';\n    if (latest.marrow < 0.42 || latest.neuropathy > 0.58 || run.state.iraeEvent?.grade === 'G2') sustainability = '需要暂停或调整';\n    else if (latest.marrow < 0.67 || latest.neuropathy > 0.28 || run.state.iraeEvent) sustainability = '需要密切管理';\n\n    const predictionResults = {};\n    for (const id of run.plan.predictions) {\n      if (id === 'disease_control') predictionResults[id] = imaging === '明确控制' || imaging === '基本稳定';\n      if (id === 'ecology_risk') predictionResults[id] = ecology === '生态风险上升';\n      if (id === 'ctdna_uncertain') predictionResults[id] = Boolean(run.state.evidence.ctdna);\n      if (id === 'toxicity') predictionResults[id] = sustainability !== '可持续';\n    }\n\n    return {\n      imaging,\n      ecology,\n      sustainability,\n      safety: safetyAtWeek4(run),\n      evidence: copy(run.state.evidence),\n      iraeEvent: run.state.iraeEvent ? copy(run.state.iraeEvent) : null,\n      internal: {\n        burdenRatio: Number(ratio.toFixed(4)),\n        escapeFraction: latest.escapeFraction,\n        marrow: latest.marrow,\n        neuropathy: latest.neuropathy\n      },\n      predictionResults,\n      interpretation: [\n        imaging === '明确控制'\n          ? '疾病负荷方向支持当前路径产生控制。'\n          : imaging === '基本稳定'\n            ? '当前评估更接近稳定，尚不能把短期稳定解释为长期生态胜利。'\n            : '当前出现进展方向；免疫路径中的疑似进展不自动等于确认进展。',\n        ecology === '生态风险上升'\n          ? '低频逃逸表型的相对比例上升，疾病控制与生态控制发生分离。'\n          : ecology === '仍有不确定性'\n            ? '现有检测提供了线索，但取样、检测下限或机制替代使结论仍不完整。'\n            : '当前未见强烈生态恶化信号，但不等于已排除低频异质性。',\n        sustainability === '可持续'\n          ? '在本模型的简化安全维度中，当前路径仍可持续。'\n          : '毒性或生理储备已影响后续治疗窗口，需要管理、暂停或调整。'\n      ]\n    };\n  }\n\n  function advanceRun(runInput, pathways, targetWeek) {\n    const run = copy(runInput);\n    const pathway = pathwayById(pathways, run.pathwayId);\n    if (!pathway) throw new Error('Pathway not found.');\n    const normalizedTarget = MILESTONES.includes(Number(targetWeek)) ? Number(targetWeek) : 8;\n    if (normalizedTarget < run.currentWeek) throw new Error('Cannot move simulation backward.');\n    const rng = mulberry32(run.seed + run.currentTick * 17 + normalizedTarget * 101);\n\n    if (!run.snapshots.some((item) => item.week === 0)) run.snapshots.push(snapshot(run, 0));\n    const targetTick = normalizedTarget * DAYS_PER_WEEK * TICKS_PER_DAY;\n    while (run.currentTick < targetTick && !run.state.stopped) tickRun(run, pathway, rng);\n    run.currentWeek = normalizedTarget;\n    if (!run.snapshots.some((item) => item.week === normalizedTarget)) run.snapshots.push(snapshot(run, normalizedTarget));\n\n    const milestone = { week: normalizedTarget, type: 'mechanism', title: `W${normalizedTarget} 节点已到达`, text: '系统在预设的临床或研究节点暂停，等待重新判断。' };\n    const payload = { run, milestone, evidence: null, safety: null, outcome: null };\n\n    if (normalizedTarget === 2) {\n      payload.evidence = evidenceAtWeek2(run, rng);\n      run.events.push({ week: 2, type: 'research', title: '研究性证据返回', text: 'ctDNA 与组织面板只能修正置信度，不能自动替玩家决定治疗。' });\n    }\n    if (normalizedTarget === 4) {\n      payload.safety = safetyAtWeek4(run);\n      run.events.push({ week: 4, type: 'clinical', title: '安全复核', text: `${payload.safety.label}；${payload.safety.action}` });\n    }\n    if (normalizedTarget === 6) {\n      run.events.push({ week: 6, type: 'mechanism', title: '继续治疗前复核', text: '重新比较疾病方向、生态风险和治疗可持续性。' });\n    }\n    if (normalizedTarget === 8) {\n      run.completed = true;\n      run.outcome = finalOutcome(run, pathway);\n      payload.outcome = copy(run.outcome);\n      run.events.push({ week: 8, type: 'clinical', title: 'W8 分类评估完成', text: `${run.outcome.imaging}；${run.outcome.ecology}；${run.outcome.sustainability}` });\n    }\n    run.events.push(milestone);\n    payload.run = run;\n    return payload;\n  }\n\n  function simulateComplete(input, pathways) {\n    let run = initializeRun(input);\n    for (const week of [2, 4, 6, 8]) run = advanceRun(run, pathways, week).run;\n    return run;\n  }\n\n  const api = Object.freeze({\n    ENGINE_VERSION,\n    TICKS_PER_DAY,\n    DAYS_PER_WEEK,\n    MILESTONES,\n    clamp,\n    mulberry32,\n    deriveHiddenTraits,\n    initializeRun,\n    advanceRun,\n    simulateComplete\n  });\n\n  scope.CRC_SIM_ENGINE = api;\n  if (typeof module !== 'undefined' && module.exports) module.exports = api;\n})(typeof self !== 'undefined' ? self : globalThis);\n\n'use strict';\n\n\nself.addEventListener('message', (event) => {\n  const message = event.data || {};\n  try {\n    if (message.type === 'INIT') {\n      const run = self.CRC_SIM_ENGINE.initializeRun(message.payload);\n      self.postMessage({ id: message.id, ok: true, type: 'INIT_RESULT', payload: run });\n      return;\n    }\n    if (message.type === 'ADVANCE') {\n      const { run, pathways, targetWeek } = message.payload;\n      const result = self.CRC_SIM_ENGINE.advanceRun(run, pathways, targetWeek);\n      self.postMessage({ id: message.id, ok: true, type: 'ADVANCE_RESULT', payload: result });\n      return;\n    }\n    if (message.type === 'SIMULATE_COMPLETE') {\n      const { input, pathways } = message.payload;\n      const result = self.CRC_SIM_ENGINE.simulateComplete(input, pathways);\n      self.postMessage({ id: message.id, ok: true, type: 'COMPLETE_RESULT', payload: result });\n      return;\n    }\n    throw new Error(`Unknown worker message: ${message.type}`);\n  } catch (error) {\n    self.postMessage({\n      id: message.id,\n      ok: false,\n      type: 'ERROR',\n      error: { name: error?.name || 'Error', message: error?.message || String(error) }\n    });\n  }\n});\n";</script>
+<script>
+(function initContentLoader(scope) {
+  'use strict';
+
+  const REQUIRED_PATHWAY_IDS = ['pembro', 'nivoipi', 'folfoxbev'];
+
+  async function fetchJson(url) {
+    const response = await fetch(url, { cache: 'no-cache', credentials: 'same-origin' });
+    if (!response.ok) throw new Error(`Content request failed: ${response.status} ${url}`);
+    return response.json();
+  }
+
+  function validateContent(bundle) {
+    if (!bundle?.manifest || Number(bundle.manifest.schemaVersion) !== 1) throw new Error('Unsupported content manifest.');
+    if (!bundle.caseData?.id || !Array.isArray(bundle.caseData.hypotheses)) throw new Error('Invalid case content.');
+    const ids = new Set((bundle.pathways?.pathways || []).map((item) => item.id));
+    for (const id of REQUIRED_PATHWAY_IDS) if (!ids.has(id)) throw new Error(`Missing pathway: ${id}`);
+    if (!Array.isArray(bundle.evidence?.items)) throw new Error('Invalid evidence content.');
+    return bundle;
+  }
+
+  async function load() {
+    if (scope.__CRC_EMBEDDED_CONTENT__) return validateContent(scope.__CRC_EMBEDDED_CONTENT__);
+    const manifest = await fetchJson('./data/content-manifest.json');
+    const [caseData, pathways, evidence] = await Promise.all([
+      fetchJson(`./data/${manifest.cases[0]}`),
+      fetchJson(`./data/${manifest.pathways}`),
+      fetchJson(`./data/${manifest.evidence}`)
+    ]);
+    return validateContent({ manifest, caseData, pathways, evidence });
+  }
+
+  scope.CRC_CONTENT_LOADER = Object.freeze({ load, validateContent });
+  if (typeof module !== 'undefined' && module.exports) module.exports = { load, validateContent };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function initSimulationEngine(scope) {
+  'use strict';
+
+  const ENGINE_VERSION = '1.0.0';
+  const TICKS_PER_DAY = 4;
+  const DAYS_PER_WEEK = 7;
+  const MILESTONES = Object.freeze([0, 2, 4, 6, 8]);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function random() {
+      a |= 0;
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function deriveHiddenTraits(seed) {
+    const rng = mulberry32(seed + 1103);
+    return {
+      b2mAltered: rng() < 0.62,
+      mhcRetained: rng() < 0.48,
+      nkCompensation: rng() < 0.52,
+      spatialBarrier: 0.18 + rng() * 0.46,
+      ctDnaShedding: 0.28 + rng() * 0.62,
+      immuneReserve: 0.48 + rng() * 0.42,
+      iraeSusceptibility: 0.35 + rng() * 0.65,
+      marrowReserve: 0.72 + rng() * 0.25,
+      ifnSignalLoss: rng() < 0.18
+    };
+  }
+
+  function copy(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function pathwayById(pathways, pathwayId) {
+    const list = pathways && Array.isArray(pathways.pathways) ? pathways.pathways : [];
+    return list.find((item) => item.id === pathwayId) || list[0];
+  }
+
+  function initializeRun({ caseData, pathways, pathwayId, hypotheses, selectedTests, predictions, seed }) {
+    if (!caseData || !pathways) throw new Error('Missing case or pathway content.');
+    const pathway = pathwayById(pathways, pathwayId);
+    if (!pathway) throw new Error('No valid pathway is available.');
+    const resolvedSeed = Number.isFinite(Number(seed)) ? Number(seed) : Number(caseData.seed) || 2107;
+    const traits = deriveHiddenTraits(resolvedSeed);
+    const escapeBaseline = traits.b2mAltered ? 0.055 : 0.026;
+    const sensitiveBaseline = 1 - escapeBaseline;
+    return {
+      engineVersion: ENGINE_VERSION,
+      caseId: caseData.id,
+      pathwayId: pathway.id,
+      seed: resolvedSeed,
+      currentTick: 0,
+      currentWeek: 0,
+      targetWeek: 0,
+      plan: {
+        hypotheses: [...new Set(hypotheses || [])].slice(0, 3),
+        selectedTests: [...new Set(selectedTests || [])],
+        predictions: [...new Set(predictions || [])]
+      },
+      traits,
+      state: {
+        sensitive: sensitiveBaseline,
+        escape: escapeBaseline,
+        immuneActivity: traits.immuneReserve,
+        reversibleExhaustion: 0.58,
+        immuneExposure: 0,
+        cytotoxicExposure: 0,
+        vascularEffect: 0,
+        perfusion: 0.46,
+        marrow: traits.marrowReserve,
+        neuropathy: 0.02,
+        iraeLoad: 0,
+        iraeEvent: null,
+        contactEfficiency: clamp(0.72 - traits.spatialBarrier * 0.55, 0.25, 0.75),
+        evidence: {},
+        stopped: false
+      },
+      snapshots: [],
+      events: [
+        {
+          week: 0,
+          type: 'clinical',
+          title: '基线已建立',
+          text: 'MSI-H / dMMR 已确认；B2M / MHC-I 状态和空间异质性仍未知。'
+        }
+      ],
+      completed: false,
+      outcome: null
+    };
+  }
+
+  function scheduledAtTick(pathway, tick) {
+    const day = tick / TICKS_PER_DAY;
+    return (pathway.schedule || []).filter((event) => event.week < 8 && Math.abs(day - event.week * DAYS_PER_WEEK) < 0.001);
+  }
+
+  function applyTreatmentPulse(run, pathway, event) {
+    const model = pathway.model || {};
+    if (pathway.id === 'pembro' || pathway.id === 'nivoipi') {
+      run.state.immuneExposure = clamp(run.state.immuneExposure + Number(model.immunePressure || 0.6) * 0.72, 0, 1.5);
+      run.events.push({ week: event.week, type: 'clinical', title: event.label, text: '按固定路径节点执行；游戏不模拟真实剂量。' });
+    } else {
+      run.state.cytotoxicExposure = clamp(run.state.cytotoxicExposure + Number(model.cytotoxicPressure || 0.6), 0, 1.5);
+      run.state.vascularEffect = clamp(run.state.vascularEffect + 0.62, 0, 1.3);
+      run.state.marrow = clamp(run.state.marrow - Number(model.marrowRisk || 0) * 0.13, 0.05, 1);
+      run.state.neuropathy = clamp(run.state.neuropathy + Number(model.neuropathyRisk || 0) * 0.055, 0, 1);
+      run.events.push({ week: event.week, type: 'clinical', title: event.label, text: '联合周期已执行；抗 VEGF 仅作为方案组成影响暴露分布。' });
+    }
+  }
+
+  function tickRun(run, pathway, rng) {
+    const s = run.state;
+    for (const event of scheduledAtTick(pathway, run.currentTick)) applyTreatmentPulse(run, pathway, event);
+
+    s.immuneExposure *= 0.995;
+    s.cytotoxicExposure *= 0.90;
+    s.vascularEffect *= 0.965;
+
+    const perfusionTarget = 0.44 + Math.min(0.16, s.vascularEffect * 0.18) - Math.max(0, s.vascularEffect - 0.95) * 0.14;
+    s.perfusion += (perfusionTarget - s.perfusion) * 0.045;
+    s.perfusion = clamp(s.perfusion, 0.22, 0.72);
+
+    const antigenPresentationSensitive = run.traits.ifnSignalLoss ? 0.36 : 0.78;
+    const antigenPresentationEscape = run.traits.ifnSignalLoss
+      ? 0.09
+      : run.traits.b2mAltered
+        ? (run.traits.mhcRetained ? 0.42 : 0.16)
+        : 0.68;
+    const contact = clamp(s.contactEfficiency * (0.82 + s.perfusion * 0.38), 0.18, 0.92);
+    const exhaustionRecovery = s.immuneExposure * (0.0048 + (run.plan.hypotheses.includes('exhaustion') ? 0.0008 : 0));
+    s.reversibleExhaustion = clamp(s.reversibleExhaustion - exhaustionRecovery + 0.0012, 0.12, 0.88);
+    const immuneFunction = clamp(s.immuneActivity * (1 - s.reversibleExhaustion * 0.58) * (run.traits.ifnSignalLoss ? 0.58 : 1), 0.05, 0.92);
+
+    const immuneKillSensitive = s.immuneExposure * immuneFunction * antigenPresentationSensitive * contact * 0.022;
+    const immuneKillEscape = s.immuneExposure * immuneFunction * antigenPresentationEscape * contact * 0.013;
+    const nkKillEscape = run.traits.nkCompensation * (1 - antigenPresentationEscape) * (0.0016 + s.immuneExposure * 0.0012);
+    const cytotoxicModifier = 0.62 + s.perfusion * 0.68;
+    const chemoKillSensitive = s.cytotoxicExposure * cytotoxicModifier * 0.027;
+    const chemoKillEscape = s.cytotoxicExposure * cytotoxicModifier * 0.021;
+
+    const carrying = 1.55;
+    const total = s.sensitive + s.escape;
+    const density = clamp(1 - total / carrying, -0.45, 1);
+    const sensitiveGrowth = 0.0033 * density;
+    const escapeCost = run.traits.b2mAltered ? 0.00055 : 0.0002;
+    const escapeGrowth = (0.00335 - escapeCost) * density;
+
+    const noiseS = (rng() - 0.5) * 0.0008;
+    const noiseE = (rng() - 0.5) * 0.0008;
+    s.sensitive = Math.max(0.002, s.sensitive * (1 + sensitiveGrowth + noiseS - immuneKillSensitive - chemoKillSensitive));
+    s.escape = Math.max(0.001, s.escape * (1 + escapeGrowth + noiseE - immuneKillEscape - nkKillEscape - chemoKillEscape));
+
+    s.immuneActivity = clamp(s.immuneActivity + s.immuneExposure * 0.0018 - s.cytotoxicExposure * 0.0024 - 0.0005, 0.12, 0.95);
+    const marrowDamage = s.cytotoxicExposure * Number(pathway.model?.marrowRisk || 0) * 0.012;
+    s.marrow = clamp(s.marrow - marrowDamage + (s.cytotoxicExposure < 0.08 ? 0.0018 : 0.00025), 0.05, 1);
+    s.neuropathy = clamp(s.neuropathy + s.cytotoxicExposure * Number(pathway.model?.neuropathyRisk || 0) * 0.0042, 0, 1);
+
+    if (!s.iraeEvent && Number(pathway.model?.iraeRisk || 0) > 0) {
+      s.iraeLoad += s.immuneExposure * Number(pathway.model.iraeRisk) * run.traits.iraeSusceptibility * 0.0038;
+      const trigger = 0.14 + rng() * 0.06;
+      if (s.iraeLoad > trigger) {
+        const selector = rng();
+        s.iraeEvent = selector < 0.22
+          ? { organ: '结肠', grade: 'G2', label: '结肠炎样事件 · G2', action: '暂停并评估处理' }
+          : selector < 0.58
+            ? { organ: '内分泌', grade: 'G1', label: '甲状腺炎样事件 · G1', action: '监测并进行器官特异评估' }
+            : { organ: '皮肤', grade: 'G1', label: '皮疹样事件 · G1', action: '观察并进行支持处理' };
+      }
+    }
+
+    run.currentTick += 1;
+    run.currentWeek = run.currentTick / (TICKS_PER_DAY * DAYS_PER_WEEK);
+  }
+
+  function snapshot(run, week) {
+    const s = run.state;
+    const total = s.sensitive + s.escape;
+    const escapeFraction = s.escape / total;
+    return {
+      week,
+      burdenIndex: Number(total.toFixed(4)),
+      escapeFraction: Number(escapeFraction.toFixed(4)),
+      immuneActivity: Number(s.immuneActivity.toFixed(4)),
+      perfusion: Number(s.perfusion.toFixed(4)),
+      marrow: Number(s.marrow.toFixed(4)),
+      neuropathy: Number(s.neuropathy.toFixed(4)),
+      iraeEvent: s.iraeEvent ? copy(s.iraeEvent) : null
+    };
+  }
+
+  function evidenceAtWeek2(run, rng) {
+    const s = run.state;
+    const total = s.sensitive + s.escape;
+    const escapeFraction = s.escape / total;
+    const evidence = {};
+    if (run.plan.selectedTests.includes('ctdna')) {
+      const detectionProbability = clamp(run.traits.ctDnaShedding * (0.28 + escapeFraction * 5.6), 0.08, 0.94);
+      const detected = rng() < detectionProbability;
+      evidence.ctdna = detected
+        ? {
+            status: '检出相关低水平信号',
+            confidence: detectionProbability > 0.65 ? '中等置信' : '低至中置信',
+            interpretation: '信号支持继续关注克隆异质性，但不能单独决定换药。'
+          }
+        : {
+            status: '未检出明确相关信号',
+            confidence: run.traits.ctDnaShedding < 0.45 ? '低置信' : '中等置信',
+            interpretation: '未检出不能排除低释放或低频克隆造成的假阴性。'
+          };
+    }
+    if (run.plan.selectedTests.includes('b2m')) {
+      const sampleHitsAlteredRegion = run.traits.b2mAltered && rng() < 0.72;
+      evidence.b2m = sampleHitsAlteredRegion
+        ? run.traits.mhcRetained
+          ? {
+              status: '检出 B2M 异常信号；MHC-I 仍部分保留',
+              confidence: '区域性中等置信',
+              interpretation: '结果支持呈递异质性，但不能推断全病灶或必然耐药。'
+            }
+          : {
+              status: '局灶 B2M 蛋白下降并伴 MHC-I 降低',
+              confidence: '区域性中等置信',
+              interpretation: '可能降低部分 CD8 识别；仍需考虑取样偏差与非 CD8 压力。'
+            }
+        : {
+            status: '本次取样未见明确 B2M / MHC-I 缺失',
+            confidence: '有限置信',
+            interpretation: '结果仅代表取样区域，不能排除未取样区域的异质性。'
+          };
+    }
+    run.state.evidence = { ...run.state.evidence, ...evidence };
+    return evidence;
+  }
+
+  function safetyAtWeek4(run) {
+    const s = run.state;
+    let label = '可继续当前路径';
+    let action = '保持监测';
+    if (s.marrow < 0.42) {
+      label = '血液学耐受需要调整';
+      action = '游戏内建议延迟下一周期；不对应真实临床阈值';
+    }
+    if (s.iraeEvent?.grade === 'G2') {
+      label = s.iraeEvent.label;
+      action = s.iraeEvent.action;
+    } else if (s.iraeEvent) {
+      label = s.iraeEvent.label;
+      action = s.iraeEvent.action;
+    }
+    return { label, action, marrowBand: s.marrow >= 0.68 ? '充足' : s.marrow >= 0.42 ? '下降' : '明显下降' };
+  }
+
+  function finalOutcome(run, pathway) {
+    const initial = run.snapshots.find((item) => item.week === 0) || { burdenIndex: 1 };
+    const latest = snapshot(run, 8);
+    const ratio = latest.burdenIndex / initial.burdenIndex;
+    const immunePathway = pathway.id !== 'folfoxbev';
+    let imaging;
+    if (ratio <= 0.72) imaging = '明确控制';
+    else if (ratio <= 1.08) imaging = '基本稳定';
+    else imaging = immunePathway ? '疑似进展（临床稳定时需后续确认）' : '进展趋势';
+
+    const initialEscape = initial.escapeFraction || 0.04;
+    const escapeChange = latest.escapeFraction - initialEscape;
+    let ecology;
+    if (escapeChange > 0.11) ecology = '生态风险上升';
+    else if (escapeChange > 0.035 || run.state.evidence.b2m) ecology = '仍有不确定性';
+    else ecology = '风险相对较低';
+
+    let sustainability = '可持续';
+    if (latest.marrow < 0.42 || latest.neuropathy > 0.58 || run.state.iraeEvent?.grade === 'G2') sustainability = '需要暂停或调整';
+    else if (latest.marrow < 0.67 || latest.neuropathy > 0.28 || run.state.iraeEvent) sustainability = '需要密切管理';
+
+    const predictionResults = {};
+    for (const id of run.plan.predictions) {
+      if (id === 'disease_control') predictionResults[id] = imaging === '明确控制' || imaging === '基本稳定';
+      if (id === 'ecology_risk') predictionResults[id] = ecology === '生态风险上升';
+      if (id === 'ctdna_uncertain') predictionResults[id] = Boolean(run.state.evidence.ctdna);
+      if (id === 'toxicity') predictionResults[id] = sustainability !== '可持续';
+    }
+
+    return {
+      imaging,
+      ecology,
+      sustainability,
+      safety: safetyAtWeek4(run),
+      evidence: copy(run.state.evidence),
+      iraeEvent: run.state.iraeEvent ? copy(run.state.iraeEvent) : null,
+      internal: {
+        burdenRatio: Number(ratio.toFixed(4)),
+        escapeFraction: latest.escapeFraction,
+        marrow: latest.marrow,
+        neuropathy: latest.neuropathy
+      },
+      predictionResults,
+      interpretation: [
+        imaging === '明确控制'
+          ? '疾病负荷方向支持当前路径产生控制。'
+          : imaging === '基本稳定'
+            ? '当前评估更接近稳定，尚不能把短期稳定解释为长期生态胜利。'
+            : '当前出现进展方向；免疫路径中的疑似进展不自动等于确认进展。',
+        ecology === '生态风险上升'
+          ? '低频逃逸表型的相对比例上升，疾病控制与生态控制发生分离。'
+          : ecology === '仍有不确定性'
+            ? '现有检测提供了线索，但取样、检测下限或机制替代使结论仍不完整。'
+            : '当前未见强烈生态恶化信号，但不等于已排除低频异质性。',
+        sustainability === '可持续'
+          ? '在本模型的简化安全维度中，当前路径仍可持续。'
+          : '毒性或生理储备已影响后续治疗窗口，需要管理、暂停或调整。'
+      ]
+    };
+  }
+
+  function advanceRun(runInput, pathways, targetWeek) {
+    const run = copy(runInput);
+    const pathway = pathwayById(pathways, run.pathwayId);
+    if (!pathway) throw new Error('Pathway not found.');
+    const normalizedTarget = MILESTONES.includes(Number(targetWeek)) ? Number(targetWeek) : 8;
+    if (normalizedTarget < run.currentWeek) throw new Error('Cannot move simulation backward.');
+    const rng = mulberry32(run.seed + run.currentTick * 17 + normalizedTarget * 101);
+
+    if (!run.snapshots.some((item) => item.week === 0)) run.snapshots.push(snapshot(run, 0));
+    const targetTick = normalizedTarget * DAYS_PER_WEEK * TICKS_PER_DAY;
+    while (run.currentTick < targetTick && !run.state.stopped) tickRun(run, pathway, rng);
+    run.currentWeek = normalizedTarget;
+    if (!run.snapshots.some((item) => item.week === normalizedTarget)) run.snapshots.push(snapshot(run, normalizedTarget));
+
+    const milestone = { week: normalizedTarget, type: 'mechanism', title: `W${normalizedTarget} 节点已到达`, text: '系统在预设的临床或研究节点暂停，等待重新判断。' };
+    const payload = { run, milestone, evidence: null, safety: null, outcome: null };
+
+    if (normalizedTarget === 2) {
+      payload.evidence = evidenceAtWeek2(run, rng);
+      run.events.push({ week: 2, type: 'research', title: '研究性证据返回', text: 'ctDNA 与组织面板只能修正置信度，不能自动替玩家决定治疗。' });
+    }
+    if (normalizedTarget === 4) {
+      payload.safety = safetyAtWeek4(run);
+      run.events.push({ week: 4, type: 'clinical', title: '安全复核', text: `${payload.safety.label}；${payload.safety.action}` });
+    }
+    if (normalizedTarget === 6) {
+      run.events.push({ week: 6, type: 'mechanism', title: '继续治疗前复核', text: '重新比较疾病方向、生态风险和治疗可持续性。' });
+    }
+    if (normalizedTarget === 8) {
+      run.completed = true;
+      run.outcome = finalOutcome(run, pathway);
+      payload.outcome = copy(run.outcome);
+      run.events.push({ week: 8, type: 'clinical', title: 'W8 分类评估完成', text: `${run.outcome.imaging}；${run.outcome.ecology}；${run.outcome.sustainability}` });
+    }
+    run.events.push(milestone);
+    payload.run = run;
+    return payload;
+  }
+
+  function simulateComplete(input, pathways) {
+    let run = initializeRun(input);
+    for (const week of [2, 4, 6, 8]) run = advanceRun(run, pathways, week).run;
+    return run;
+  }
+
+  const api = Object.freeze({
+    ENGINE_VERSION,
+    TICKS_PER_DAY,
+    DAYS_PER_WEEK,
+    MILESTONES,
+    clamp,
+    mulberry32,
+    deriveHiddenTraits,
+    initializeRun,
+    advanceRun,
+    simulateComplete
+  });
+
+  scope.CRC_SIM_ENGINE = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof self !== 'undefined' ? self : globalThis);
+
+</script>
+<script>
+(function initStorage(scope) {
+  'use strict';
+
+  const DB_NAME = 'crc-immune-frontier';
+  const DB_VERSION = 2;
+  const STORE = 'saves';
+  const FALLBACK_KEY = 'crc-immune-frontier-v1-fallback';
+  const SAVE_SCHEMA = 2;
+  const memoryStore = new Map();
+
+  function stableStringify(value) {
+    if (value === null || typeof value !== 'object') return JSON.stringify(value);
+    if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+    const keys = Object.keys(value).sort();
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
+  }
+
+  function checksum(value) {
+    const text = stableStringify(value);
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function normalizeSave(raw) {
+    if (!raw || typeof raw !== 'object') throw new Error('存档格式无效。');
+    const payload = raw.payload || raw;
+    const schema = Number(raw.schemaVersion || payload.schemaVersion || 1);
+    const migrated = schema === 1 ? { ...payload, schemaVersion: SAVE_SCHEMA, ui: payload.ui || {} } : { ...payload };
+    migrated.schemaVersion = SAVE_SCHEMA;
+    if (!migrated.appVersion) migrated.appVersion = '1.0.0';
+    if (!migrated.caseId) migrated.caseId = 'case-b2m-escape';
+    if (!migrated.updatedAt) migrated.updatedAt = new Date().toISOString();
+    return migrated;
+  }
+
+  function envelope(payload) {
+    const normalized = normalizeSave(payload);
+    return {
+      schemaVersion: SAVE_SCHEMA,
+      createdAt: normalized.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      checksum: checksum(normalized),
+      payload: normalized
+    };
+  }
+
+  function verifyEnvelope(raw) {
+    if (!raw || typeof raw !== 'object') throw new Error('存档为空或损坏。');
+    const payload = normalizeSave(raw.payload || raw);
+    if (raw.checksum && raw.checksum !== checksum(payload)) throw new Error('存档校验失败，文件可能不完整。');
+    return payload;
+  }
+
+  function openDb() {
+    return new Promise((resolve, reject) => {
+      if (!('indexedDB' in scope)) return reject(new Error('IndexedDB unavailable.'));
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'slot' });
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error('IndexedDB open failed.'));
+    });
+  }
+
+  async function save(slot, payload) {
+    const record = { slot, ...envelope(payload) };
+    try {
+      const db = await openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(record);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+      db.close();
+      return { backend: 'indexedDB', record };
+    } catch (error) {
+      try {
+        localStorage.setItem(`${FALLBACK_KEY}:${slot}`, JSON.stringify(record));
+        return { backend: 'localStorage', record, warning: error.message };
+      } catch (storageError) {
+        memoryStore.set(slot, record);
+        return { backend: 'memory', record, warning: `${error.message}; ${storageError.message}` };
+      }
+    }
+  }
+
+  async function load(slot) {
+    try {
+      const db = await openDb();
+      const record = await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const request = tx.objectStore(STORE).get(slot);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+      if (record) return { backend: 'indexedDB', payload: verifyEnvelope(record), record };
+    } catch {}
+    try {
+      const raw = localStorage.getItem(`${FALLBACK_KEY}:${slot}`);
+      if (raw) {
+        const record = JSON.parse(raw);
+        return { backend: 'localStorage', payload: verifyEnvelope(record), record };
+      }
+    } catch {}
+    const memoryRecord = memoryStore.get(slot);
+    if (!memoryRecord) return null;
+    return { backend: 'memory', payload: verifyEnvelope(memoryRecord), record: memoryRecord };
+  }
+
+  async function list() {
+    const records = [];
+    try {
+      const db = await openDb();
+      const items = await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const request = tx.objectStore(STORE).getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+      records.push(...items);
+    } catch {}
+    try {
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (key?.startsWith(`${FALLBACK_KEY}:`)) {
+          try {
+            const record = JSON.parse(localStorage.getItem(key));
+            if (!records.some((item) => item.slot === record.slot)) records.push(record);
+          } catch {}
+        }
+      }
+    } catch {}
+    for (const record of memoryStore.values()) {
+      if (!records.some((item) => item.slot === record.slot)) records.push(record);
+    }
+    return records.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  }
+
+  async function remove(slot) {
+    try {
+      const db = await openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(slot);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+      db.close();
+    } catch {}
+    try { localStorage.removeItem(`${FALLBACK_KEY}:${slot}`); } catch {}
+    memoryStore.delete(slot);
+  }
+
+  function exportText(payload) {
+    return JSON.stringify(envelope(payload), null, 2);
+  }
+
+  function importText(text) {
+    return verifyEnvelope(JSON.parse(text));
+  }
+
+  scope.CRC_STORAGE = Object.freeze({ SAVE_SCHEMA, checksum, normalizeSave, verifyEnvelope, save, load, list, remove, exportText, importText });
+  if (typeof module !== 'undefined' && module.exports) module.exports = scope.CRC_STORAGE;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(() => {
+  'use strict';
+
+  const APP_VERSION = '1.0.0';
+  const AUTO_SLOT = 'autosave';
+  const MILESTONES = [0, 2, 4, 6, 8];
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+  let content = null;
+  let state = null;
+  let simulation = null;
+  let busy = false;
+  let activeFilter = 'all';
+  let comparisonRuns = null;
+  let installPrompt = null;
+  let landingAnimation = 0;
+  let mapRegions = [];
+  let selectedRegionIndex = 0;
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function defaultState() {
+    return {
+      schemaVersion: 2,
+      appVersion: APP_VERSION,
+      caseId: 'case-b2m-escape',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      phase: 'planning',
+      pathwayId: 'pembro',
+      hypotheses: ['presentation'],
+      selectedTests: ['ctdna', 'b2m', 'imaging'],
+      predictions: ['disease_control'],
+      run: null,
+      events: [
+        { week: 0, type: 'clinical', title: '病例基线建立', text: 'MSI-H / dMMR 已确认；当前尚无治疗后影像结果。' },
+        { week: 0, type: 'mechanism', title: '保留不确定性', text: 'B2M / MHC-I 异质性被记录为假设，而不是确定性耐药结论。' }
+      ],
+      ui: {
+        view: 'command',
+        textScale: 'normal',
+        highContrast: false,
+        reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
+        autosave: true,
+        layer: 'cells',
+        regionIndex: 0
+      }
+    };
+  }
+
+  function sanitizeState(raw) {
+    const base = defaultState();
+    if (!raw || typeof raw !== 'object') return base;
+    const pathwayIds = new Set((content?.pathways?.pathways || []).map((item) => item.id));
+    const hypothesisIds = new Set((content?.caseData?.hypotheses || []).map((item) => item.id));
+    const testIds = new Set((content?.caseData?.tests || []).map((item) => item.id));
+    const predictionIds = new Set((content?.caseData?.predictions || []).map((item) => item.id));
+    const ui = raw.ui && typeof raw.ui === 'object' ? raw.ui : {};
+    const normalized = {
+      ...base,
+      ...raw,
+      schemaVersion: 2,
+      appVersion: APP_VERSION,
+      phase: ['planning', 'active', 'completed'].includes(raw.phase) ? raw.phase : base.phase,
+      pathwayId: pathwayIds.has(raw.pathwayId) ? raw.pathwayId : base.pathwayId,
+      hypotheses: Array.isArray(raw.hypotheses) ? [...new Set(raw.hypotheses.filter((id) => hypothesisIds.has(id)))].slice(0, 3) : base.hypotheses,
+      selectedTests: Array.isArray(raw.selectedTests) ? [...new Set(raw.selectedTests.filter((id) => testIds.has(id)))] : base.selectedTests,
+      predictions: Array.isArray(raw.predictions) ? [...new Set(raw.predictions.filter((id) => predictionIds.has(id)))] : base.predictions,
+      run: raw.run && typeof raw.run === 'object' ? raw.run : null,
+      events: Array.isArray(raw.events)
+        ? raw.events.slice(-160).map((event) => ({
+            week: Math.max(0, Math.min(8, Number(event?.week) || 0)),
+            type: ['clinical', 'research', 'mechanism', 'warning'].includes(event?.type) ? event.type : 'mechanism',
+            title: String(event?.title || '事件').slice(0, 120),
+            text: String(event?.text || '').slice(0, 800)
+          }))
+        : base.events,
+      ui: {
+        view: ['command', 'ecology', 'evidence', 'compare'].includes(ui.view) ? ui.view : base.ui.view,
+        textScale: ['normal', 'large', 'xlarge'].includes(ui.textScale) ? ui.textScale : base.ui.textScale,
+        highContrast: Boolean(ui.highContrast),
+        reducedMotion: Boolean(ui.reducedMotion),
+        autosave: ui.autosave !== false,
+        layer: ['cells', 'presentation', 'contact', 'perfusion'].includes(ui.layer) ? ui.layer : base.ui.layer,
+        regionIndex: Number.isInteger(ui.regionIndex) ? Math.max(0, Math.min(5, ui.regionIndex)) : 0
+      }
+    };
+    if (!normalized.hypotheses.length) normalized.hypotheses = base.hypotheses;
+    if (!normalized.predictions.length) normalized.predictions = base.predictions;
+    if (!normalized.selectedTests.includes('imaging')) normalized.selectedTests.push('imaging');
+    if (normalized.phase !== 'planning' && !normalized.run) normalized.phase = 'planning';
+    return normalized;
+  }
+
+  function currentWeek() {
+    return state?.run ? Math.round(Number(state.run.currentWeek) || 0) : 0;
+  }
+
+  function currentPathway() {
+    return content.pathways.pathways.find((item) => item.id === state.pathwayId) || content.pathways.pathways[0];
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  }
+
+  function formatDate(value) {
+    try {
+      return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    } catch {
+      return String(value || '');
+    }
+  }
+
+  function setBootMessage(message) {
+    $('#bootMessage').textContent = message;
+  }
+
+  function showFatal(error) {
+    console.error(error);
+    $('#bootScreen').classList.add('is-hidden');
+    $('#landing').classList.add('is-hidden');
+    $('#appShell').classList.add('is-hidden');
+    $('#fatalScreen').classList.remove('is-hidden');
+    $('#fatalMessage').textContent = error?.message || String(error);
+  }
+
+  function toast(title, text) {
+    const node = document.createElement('div');
+    node.className = 'toast';
+    node.innerHTML = `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(text)}</span>`;
+    $('#toastRegion').appendChild(node);
+    window.setTimeout(() => node.remove(), 4600);
+  }
+
+  function applyUiPreferences() {
+    document.body.dataset.textScale = state.ui.textScale;
+    document.body.classList.toggle('high-contrast', state.ui.highContrast);
+    document.body.classList.toggle('reduce-motion', state.ui.reducedMotion);
+    $('#textScaleSelect').value = state.ui.textScale;
+    $('#contrastToggle').checked = state.ui.highContrast;
+    $('#motionToggle').checked = state.ui.reducedMotion;
+    $('#autosaveToggle').checked = state.ui.autosave;
+    $('#textScaleButton').textContent = state.ui.textScale === 'normal' ? 'A+' : state.ui.textScale === 'large' ? 'A++' : 'A';
+  }
+
+  function addEvent(type, title, text, week = currentWeek()) {
+    const item = { week, type, title, text };
+    state.events.push(item);
+    state.events = state.events.slice(-160);
+    if (state.run) {
+      state.run.events = [...(state.run.events || []), item].slice(-160);
+    }
+  }
+
+  async function persist(showToast = false) {
+    state.updatedAt = new Date().toISOString();
+    if (!state.ui.autosave && !showToast) return;
+    const result = await window.CRC_STORAGE.save(AUTO_SLOT, state);
+    $('#saveMetric').textContent = result.backend === 'indexedDB' ? '已保存' : '兼容存储';
+    if (showToast) toast('存档完成', result.backend === 'indexedDB' ? '已保存到浏览器本地数据库。' : '已保存到浏览器兼容存储。');
+  }
+
+  function createSimulationClient() {
+    let worker = null;
+    let sequence = 0;
+    const pending = new Map();
+    let fallback = false;
+
+    function useFallback(reason) {
+      if (!fallback) {
+        fallback = true;
+        console.warn('Simulation worker fallback:', reason);
+        toast('兼容模式', 'Web Worker 不可用，模拟已回退到主线程。核心结果保持确定性。');
+      }
+    }
+
+    try {
+      if (window.__CRC_EMBEDDED_WORKER__) {
+        const blob = new Blob([window.__CRC_EMBEDDED_WORKER__], { type: 'text/javascript' });
+        worker = new Worker(URL.createObjectURL(blob));
+      } else {
+        worker = new Worker('./js/sim-worker.js');
+      }
+      worker.addEventListener('message', (event) => {
+        const message = event.data || {};
+        const entry = pending.get(message.id);
+        if (!entry) return;
+        pending.delete(message.id);
+        window.clearTimeout(entry.timeout);
+        if (message.ok) entry.resolve(message.payload);
+        else entry.reject(new Error(message.error?.message || 'Simulation worker failed.'));
+      });
+      worker.addEventListener('error', (event) => {
+        useFallback(event.message || 'Worker error');
+        for (const entry of pending.values()) entry.reject(new Error('Simulation worker unavailable.'));
+        pending.clear();
+        worker?.terminate();
+        worker = null;
+      });
+    } catch (error) {
+      useFallback(error.message);
+      worker = null;
+    }
+
+    function direct(type, payload) {
+      const engine = window.CRC_SIM_ENGINE;
+      if (type === 'INIT') return engine.initializeRun(payload);
+      if (type === 'ADVANCE') return engine.advanceRun(payload.run, payload.pathways, payload.targetWeek);
+      if (type === 'SIMULATE_COMPLETE') return engine.simulateComplete(payload.input, payload.pathways);
+      throw new Error(`Unknown direct simulation call: ${type}`);
+    }
+
+    function request(type, payload) {
+      if (!worker || fallback) return Promise.resolve().then(() => direct(type, payload));
+      const id = `sim-${Date.now()}-${sequence += 1}`;
+      return new Promise((resolve, reject) => {
+        const timeout = window.setTimeout(() => {
+          pending.delete(id);
+          useFallback('Worker timeout');
+          Promise.resolve().then(() => direct(type, payload)).then(resolve, reject);
+        }, 12000);
+        pending.set(id, { resolve, reject, timeout });
+        worker.postMessage({ id, type, payload });
+      });
+    }
+
+    return {
+      init: (payload) => request('INIT', payload),
+      advance: (payload) => request('ADVANCE', payload),
+      simulateComplete: (payload) => request('SIMULATE_COMPLETE', payload),
+      terminate: () => worker?.terminate()
+    };
+  }
+
+  function showLanding() {
+    $('#bootScreen').classList.add('is-hidden');
+    $('#appShell').classList.add('is-hidden');
+    $('#landing').classList.remove('is-hidden');
+    if (state.phase !== 'planning' || state.run || state.events.length > 2) $('#continueCaseButton').classList.remove('is-hidden');
+    else $('#continueCaseButton').classList.add('is-hidden');
+    startLandingAnimation();
+  }
+
+  function enterApp() {
+    cancelAnimationFrame(landingAnimation);
+    $('#landing').classList.add('is-hidden');
+    $('#appShell').classList.remove('is-hidden');
+    applyUiPreferences();
+    renderAll();
+    showView(state.ui.view || 'command', false);
+    $('#mainContent').focus({ preventScroll: true });
+  }
+
+  function startNewCase() {
+    const preferences = state?.ui ? clone(state.ui) : null;
+    state = defaultState();
+    if (preferences) state.ui = { ...state.ui, ...preferences };
+    comparisonRuns = null;
+    persist(false).catch(console.error);
+    enterApp();
+    toast('新病例已建立', '固定病例种子 2101；可先形成假设，再提交路径。');
+  }
+
+  function renderAll() {
+    renderHeader();
+    renderProgress();
+    renderCaseBrief();
+    renderHypotheses();
+    renderPathways();
+    renderTestsAndTimeline();
+    renderPredictions();
+    renderForecast();
+    renderEvents();
+    renderEvidence();
+    renderMap();
+    renderCompare();
+    updateControlLocking();
+  }
+
+  function renderHeader() {
+    const week = currentWeek();
+    $('#weekMetric').textContent = `W${week}`;
+    $('#pathMetric').textContent = state.phase === 'planning' ? '未提交' : currentPathway().shortName;
+    $('#caseEyebrow').textContent = `${content.caseData.title} · ${content.caseData.durationMinutes} 分钟`;
+    $('#caseSubtitle').textContent = content.caseData.subtitle;
+    $('#footerVersion').textContent = `应用 v${APP_VERSION} · 内容 ${content.manifest.contentVersion} · 医学基线 ${content.manifest.medicalBaseline}`;
+    $('#contentBaseline').textContent = `医学内容基线：${content.manifest.medicalBaseline}`;
+    const next = MILESTONES.find((item) => item > week);
+    if (state.phase === 'planning') $('#advanceButton').textContent = '提交计划并推进到 W2';
+    else if (state.phase === 'completed') $('#advanceButton').textContent = '病例已完成';
+    else $('#advanceButton').textContent = `推进到 W${next}`;
+    $('#advanceButton').disabled = busy || state.phase === 'completed';
+  }
+
+  function renderProgress() {
+    const labels = { 0: '基线与计划', 2: '研究证据', 4: '安全复核', 6: '继续治疗', 8: '分类影像' };
+    const week = currentWeek();
+    $('#progressRail').innerHTML = MILESTONES.map((item) => {
+      const className = item === week ? 'is-current' : item < week ? 'is-complete' : '';
+      return `<div class="progress-node ${className}"><strong>W${item}</strong><span>${labels[item]}</span></div>`;
+    }).join('');
+  }
+
+  function renderCaseBrief() {
+    const frame = content.caseData.clinicalFrame;
+    const run = state.run;
+    const facts = [
+      ['已知', 'MSI-H / dMMR', '适应证前提已确认'],
+      ['评估节点', 'W8', '不在一周内报告疗效'],
+      ['当前状态', state.phase === 'planning' ? '尚未提交路径' : currentPathway().shortName, state.phase === 'completed' ? 'W8 已完成' : `当前 W${currentWeek()}`]
+    ];
+    let html = `<div class="fact-grid">${facts.map(([label, value, note]) => `<div class="fact"><span>${label}</span><strong>${value}</strong><small>${note}</small></div>`).join('')}</div>`;
+    const risks = [...frame.unknown];
+    if (run?.outcome) risks.unshift(`${run.outcome.imaging}；${run.outcome.ecology}`);
+    html += `<ul class="risk-list">${risks.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    html += `<div class="notice"><b>病例边界</b><span>${escapeHtml(frame.disclaimer)}</span></div>`;
+    $('#caseBrief').innerHTML = html;
+  }
+
+  function renderHypotheses() {
+    $('#hypothesisCount').textContent = `${state.hypotheses.length} / 3`;
+    $('#hypothesisList').innerHTML = content.caseData.hypotheses.map((item, index) => {
+      const selected = state.hypotheses.includes(item.id);
+      return `<button class="hypothesis ${selected ? 'is-selected' : ''}" data-hypothesis="${item.id}" aria-pressed="${selected}"><span>H${index + 1}</span><div><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.summary)}</p><small>证据层：${escapeHtml(item.evidenceTier)}</small></div></button>`;
+    }).join('');
+  }
+
+  function renderPathways() {
+    $('#pathwayList').innerHTML = content.pathways.pathways.map((item) => {
+      const selected = state.pathwayId === item.id;
+      const code = item.id === 'pembro' ? 'P' : item.id === 'nivoipi' ? 'N+I' : 'F+B';
+      return `<button class="pathway ${selected ? 'is-selected' : ''}" data-pathway="${item.id}" role="radio" aria-checked="${selected}"><span class="pathway-code">${code}</span><div><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.clinicalStatus)}</p><small>${escapeHtml(item.gameBoundary)}</small></div><em>${escapeHtml(item.shortName)}</em></button>`;
+    }).join('');
+    const pathway = currentPathway();
+    $('#pathwaySummary').innerHTML = `<strong>机制：</strong>${pathway.mechanism.map(escapeHtml).join('；')}<br><strong>主要代价：</strong>${pathway.risks.map(escapeHtml).join('；')}`;
+  }
+
+  function renderTestsAndTimeline() {
+    const locked = state.phase !== 'planning';
+    $('#testOptions').innerHTML = content.caseData.tests.map((test) => {
+      const selected = state.selectedTests.includes(test.id);
+      const fixed = test.id === 'imaging';
+      const label = test.classification === 'clinical' ? '临床节点' : test.classification === 'research' ? '研究性' : '转化研究';
+      return `<label class="test-option"><input type="checkbox" data-test="${test.id}" ${selected ? 'checked' : ''} ${fixed || locked ? 'disabled' : ''}><span><strong>${escapeHtml(test.name)} · ${label}</strong><p>W${test.collectWeek} 采样 / W${test.returnWeek} 返回</p><small>${escapeHtml(test.limitations.join('；'))}</small></span></label>`;
+    }).join('');
+
+    const pathway = currentPathway();
+    const weekNow = currentWeek();
+    const selectedTests = content.caseData.tests.filter((test) => state.selectedTests.includes(test.id));
+    $('#timeline').innerHTML = Array.from({ length: 9 }, (_, week) => {
+      const treatmentEvents = pathway.schedule.filter((event) => event.week === week);
+      const testEvents = selectedTests.flatMap((test) => {
+        const events = [];
+        if (test.collectWeek === week && test.returnWeek !== week) events.push({ label: `${test.name}采样`, type: test.classification === 'clinical' ? 'clinical' : 'research' });
+        if (test.returnWeek === week) events.push({ label: `${test.name}${test.collectWeek === week ? '' : '返回'}`, type: test.classification === 'clinical' ? 'clinical' : 'research' });
+        return events;
+      });
+      return `<div class="timeline-week ${week === weekNow ? 'is-current' : ''}"><strong>W${week}</strong>${treatmentEvents.map((event) => `<div class="timeline-event clinical">${escapeHtml(event.label)}</div>`).join('')}${testEvents.map((event) => `<div class="timeline-event ${event.type}">${escapeHtml(event.label)}</div>`).join('')}</div>`;
+    }).join('');
+  }
+
+  function renderPredictions() {
+    $('#predictionGrid').innerHTML = content.caseData.predictions.map((item) => {
+      const selected = state.predictions.includes(item.id);
+      return `<button class="prediction ${selected ? 'is-selected' : ''}" data-prediction="${item.id}" aria-pressed="${selected}"><span>${escapeHtml(item.dimension)}</span><strong>${escapeHtml(item.label)}</strong></button>`;
+    }).join('');
+  }
+
+  function renderForecast() {
+    const pathway = currentPathway();
+    const uncertainty = state.selectedTests.includes('ctdna') && state.selectedTests.includes('b2m') ? '中等' : '较高';
+    const toxicity = pathway.id === 'nivoipi' ? 'irAE 风险较高' : pathway.id === 'folfoxbev' ? '骨髓与神经毒性累积' : 'irAE 风险存在';
+    const timing = pathway.id === 'folfoxbev' ? 'q2w-like 固定周期' : 'q3w-like 固定节点';
+    $('#forecast').innerHTML = [
+      ['路径节奏', timing],
+      ['主要安全信号', toxicity],
+      ['结论不确定性', uncertainty]
+    ].map(([label, value]) => `<div class="forecast-item"><span>${label}</span><strong>${value}</strong></div>`).join('');
+  }
+
+  function renderEvents() {
+    const list = state.events.filter((item) => activeFilter === 'all' || item.type === activeFilter).slice().reverse();
+    $('#eventList').innerHTML = list.length
+      ? list.map((item) => `<article class="event-item" data-type="${item.type}"><time>W${item.week}</time><span class="event-dot" aria-hidden="true"></span><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.text)}</p></div></article>`).join('')
+      : '<p class="empty-state">当前筛选下没有事件。</p>';
+  }
+
+  function renderEvidence() {
+    const conceptCards = [
+      {
+        code: 'B', title: 'B2M / MHC-I', subtitle: '风险因子，不是必然失败开关',
+        rows: [['已知', 'B2M 改变可影响 MHC-I 相关呈递。'], ['不确定', 'MSI-H CRC 中，B2M 缺失并不稳定预测检查点治疗无获益。'], ['游戏实现', '改变响应分布与生态风险，不直接强制耐药。']],
+        refs: ['b2m-msih-crc']
+      },
+      {
+        code: 'D', title: 'ctDNA 动态', subtitle: '研究信号，不是即时雷达',
+        rows: [['可用信息', '输出检出 / 未检出、趋势和置信度。'], ['限制', '低释放、低频克隆和技术灵敏度可造成假阴性。'], ['游戏实现', '研究结果不会自动触发换药。']],
+        refs: ['esmo-ctdna-2022']
+      },
+      {
+        code: 'I', title: '影像与疑似进展', subtitle: '按评估节点，而非逐周判疗效',
+        rows: [['常规原则', '影像在预设节点分类评估。'], ['免疫研究框架', '疑似进展在临床稳定时可能需要后续确认。'], ['游戏实现', 'W8 分类；疑似进展不自动判定终局。']],
+        refs: ['irecist-2017']
+      },
+      {
+        code: 'T', title: '免疫相关不良事件', subtitle: '器官与等级，而非单一百分比',
+        rows: [['临床框架', '识别具体器官系统并按严重程度处理。'], ['游戏实现', '以甲状腺炎、皮疹或结肠炎等事件呈现。'], ['边界', '不把模型阈值写成临床处置规则。']],
+        refs: ['asco-irae-2021']
+      }
+    ];
+    const pathwayCards = content.pathways.pathways.map((pathway) => ({
+      code: pathway.id === 'pembro' ? 'P' : pathway.id === 'nivoipi' ? 'N+I' : 'F+B',
+      title: pathway.name,
+      subtitle: pathway.clinicalStatus,
+      rows: [['机制证据', pathway.mechanism.join('；')], ['主要风险', pathway.risks.join('；')], ['游戏抽象', pathway.gameBoundary]],
+      refs: pathway.id === 'pembro' ? ['fda-pembro-crc-2020'] : pathway.id === 'nivoipi' ? ['fda-nivo-ipi-crc-2025'] : ['dailymed-bevacizumab']
+    }));
+    const refs = new Map(content.evidence.items.map((item) => [item.id, item]));
+    $('#evidenceGrid').innerHTML = [...pathwayCards, ...conceptCards].map((card) => {
+      const sources = card.refs.map((id) => refs.get(id)).filter(Boolean);
+      return `<article class="evidence-card"><header><span>${card.code}</span><div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.subtitle)}</p></div></header><dl>${card.rows.map(([term, description]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(description)}</dd></div>`).join('')}</dl><footer>${sources.map((source) => `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.organization)} · ${escapeHtml(source.date)}</a>`).join('<br>')}</footer></article>`;
+    }).join('');
+  }
+
+  function createMapRegions() {
+    const traits = state.run?.traits || window.CRC_SIM_ENGINE.deriveHiddenTraits(content.caseData.seed);
+    const outcome = state.run?.outcome;
+    const escape = outcome?.internal?.escapeFraction ?? (traits.b2mAltered ? 0.08 : 0.035);
+    return [
+      { id: 0, name: '肿瘤中心', x: 0.5, y: 0.5, presentation: traits.b2mAltered ? '低至中' : '中', contact: '低', perfusion: '低', clone: escape > 0.16 ? '逃逸表型富集' : '主克隆为主', note: '低灌注与空间拥挤降低有效接触。' },
+      { id: 1, name: '侵袭边缘', x: 0.28, y: 0.34, presentation: '中', contact: '中至高', perfusion: '中', clone: '混合', note: 'CD8 聚集不等于已经形成有效杀伤。' },
+      { id: 2, name: '血管邻近区', x: 0.72, y: 0.28, presentation: '中', contact: '中', perfusion: '较高', clone: '主克隆为主', note: '局部暴露较高，但不能代表整个病灶。' },
+      { id: 3, name: '间质屏障', x: 0.73, y: 0.66, presentation: '未知', contact: '低', perfusion: '中低', clone: '未充分取样', note: '基质和趋化不匹配可造成排斥型结构。' },
+      { id: 4, name: '活检区域', x: 0.34, y: 0.7, presentation: traits.mhcRetained ? '部分保留' : '局灶降低', contact: '中', perfusion: '中', clone: traits.b2mAltered ? '可能含 B2M 异常' : '未见明确异常', note: '组织面板只代表这个取样区域。' },
+      { id: 5, name: '坏死邻近区', x: 0.52, y: 0.22, presentation: '不稳定', contact: '低', perfusion: '低', clone: '检测质量受限', note: '坏死和低氧可影响样本质量与局部免疫功能。' }
+    ];
+  }
+
+  function renderMap() {
+    mapRegions = createMapRegions();
+    selectedRegionIndex = Math.max(0, Math.min(mapRegions.length - 1, state.ui.regionIndex || 0));
+    const canvas = $('#ecologyCanvas');
+    if (!canvas || canvas.offsetParent === null) return;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(640, Math.round(rect.width * dpr));
+    canvas.height = Math.max(420, Math.round(rect.height * dpr));
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const width = rect.width;
+    const height = rect.height;
+    ctx.clearRect(0, 0, width, height);
+
+    const gradient = ctx.createRadialGradient(width * 0.5, height * 0.48, 20, width * 0.5, height * 0.5, width * 0.48);
+    gradient.addColorStop(0, '#1a3a3f');
+    gradient.addColorStop(0.58, '#0d272c');
+    gradient.addColorStop(1, '#061214');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    const seed = content.caseData.seed;
+    const rng = window.CRC_SIM_ENGINE.mulberry32(seed + 720);
+    const layer = state.ui.layer;
+    for (let i = 0; i < 380; i += 1) {
+      const angle = rng() * Math.PI * 2;
+      const radius = Math.sqrt(rng()) * Math.min(width, height) * 0.43;
+      const x = width * 0.5 + Math.cos(angle) * radius * 1.25;
+      const y = height * 0.5 + Math.sin(angle) * radius * 0.84;
+      const size = 1.8 + rng() * 4.2;
+      if (layer === 'presentation') ctx.fillStyle = rng() > 0.38 ? 'rgba(99,230,213,.52)' : 'rgba(255,141,131,.30)';
+      else if (layer === 'contact') ctx.fillStyle = rng() > 0.72 ? 'rgba(131,185,255,.72)' : 'rgba(123,69,91,.35)';
+      else if (layer === 'perfusion') ctx.fillStyle = `rgba(240,195,107,${0.12 + rng() * 0.48})`;
+      else ctx.fillStyle = rng() > 0.84 ? 'rgba(131,185,255,.72)' : rng() > 0.64 ? 'rgba(255,141,131,.45)' : 'rgba(99,230,213,.32)';
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    mapRegions.forEach((region, index) => {
+      const x = region.x * width;
+      const y = region.y * height;
+      ctx.strokeStyle = index === selectedRegionIndex ? '#f0c36b' : 'rgba(238,248,245,.62)';
+      ctx.lineWidth = index === selectedRegionIndex ? 3 : 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, index === selectedRegionIndex ? 18 : 13, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = index === selectedRegionIndex ? '#f0c36b' : '#eef8f5';
+      ctx.font = '700 12px system-ui';
+      ctx.fillText(String(index + 1), x - 3.5, y + 4);
+    });
+
+    $$('.layer-tabs button').forEach((button) => button.classList.toggle('is-active', button.dataset.layer === layer));
+    $('#regionButtons').innerHTML = mapRegions.map((region, index) => `<button data-region="${index}" class="${index === selectedRegionIndex ? 'is-selected' : ''}">${index + 1}. ${escapeHtml(region.name)}</button>`).join('');
+    renderRegionInspector(mapRegions[selectedRegionIndex]);
+  }
+
+  function renderRegionInspector(region) {
+    if (!region) return;
+    $('#regionInspector').innerHTML = `<h3>${escapeHtml(region.name)}</h3><p>${escapeHtml(region.note)}</p><div class="inspector-grid"><div><span>抗原呈递</span><strong>${escapeHtml(region.presentation)}</strong></div><div><span>CD8 有效接触</span><strong>${escapeHtml(region.contact)}</strong></div><div><span>灌注</span><strong>${escapeHtml(region.perfusion)}</strong></div><div><span>克隆信息</span><strong>${escapeHtml(region.clone)}</strong></div></div>`;
+  }
+
+  function renderCompare() {
+    const ready = state.phase === 'completed' && comparisonRuns;
+    $('#compareEmpty').classList.toggle('is-hidden', ready);
+    $('#compareBoard').classList.toggle('is-hidden', !ready);
+    if (!ready) return;
+    $('#compareBoard').innerHTML = content.pathways.pathways.map((pathway) => {
+      const run = comparisonRuns[pathway.id];
+      const outcome = run?.outcome;
+      if (!outcome) return '';
+      const current = pathway.id === state.pathwayId;
+      return `<article class="compare-card ${current ? 'is-current' : ''}"><p class="eyebrow">${current ? '当前路径' : '同种子反事实'}</p><h3>${escapeHtml(pathway.name)}</h3><p>${escapeHtml(pathway.gameBoundary)}</p><div class="dimension-list"><div class="dimension"><span>疾病控制</span><strong>${escapeHtml(outcome.imaging)}</strong><small>${escapeHtml(outcome.interpretation[0])}</small></div><div class="dimension"><span>生态风险</span><strong>${escapeHtml(outcome.ecology)}</strong><small>${escapeHtml(outcome.interpretation[1])}</small></div><div class="dimension"><span>治疗可持续性</span><strong>${escapeHtml(outcome.sustainability)}</strong><small>${escapeHtml(outcome.interpretation[2])}</small></div></div></article>`;
+    }).join('');
+  }
+
+  function updateControlLocking() {
+    const pathwayLocked = state.phase !== 'planning' || busy;
+    const planLocked = state.phase !== 'planning' || busy;
+    $$('.pathway').forEach((button) => { button.disabled = pathwayLocked; });
+    $$('.prediction').forEach((button) => { button.disabled = planLocked; });
+    $$('.hypothesis').forEach((button) => { button.disabled = busy; });
+  }
+
+  function showView(viewName, focus = true) {
+    const allowed = ['command', 'ecology', 'evidence', 'compare'];
+    const name = allowed.includes(viewName) ? viewName : 'command';
+    state.ui.view = name;
+    $$('.view').forEach((view) => view.classList.toggle('is-active', view.id === `view-${name}`));
+    $$('.nav-button').forEach((button) => button.classList.toggle('is-active', button.dataset.view === name));
+    if (name === 'ecology') requestAnimationFrame(renderMap);
+    if (name === 'compare') renderCompare();
+    if (focus) $(`#view-${name} h2`)?.focus?.({ preventScroll: false });
+    persist(false).catch(console.error);
+  }
+
+  function toggleHypothesis(id) {
+    if (busy) return;
+    const selected = state.hypotheses.includes(id);
+    if (selected && state.hypotheses.length === 1) return toast('至少保留一个假设', '机制假设板不能完全为空。');
+    if (!selected && state.hypotheses.length >= 3) return toast('假设槽已满', '最多同时保留三个重点假设。');
+    state.hypotheses = selected ? state.hypotheses.filter((item) => item !== id) : [...state.hypotheses, id];
+    if (state.run) state.run.plan.hypotheses = [...state.hypotheses];
+    addEvent('mechanism', '机制假设已修订', `当前假设：${state.hypotheses.map((item) => content.caseData.hypotheses.find((h) => h.id === item)?.name).filter(Boolean).join('、')}`);
+    renderHypotheses();
+    renderEvents();
+    updateControlLocking();
+    persist(false).catch(console.error);
+  }
+
+  function setPathway(id) {
+    if (state.phase !== 'planning' || busy) return;
+    if (!content.pathways.pathways.some((item) => item.id === id)) return;
+    state.pathwayId = id;
+    renderPathways();
+    renderTestsAndTimeline();
+    renderForecast();
+    renderHeader();
+    updateControlLocking();
+    persist(false).catch(console.error);
+  }
+
+  function setTest(id, checked) {
+    if (state.phase !== 'planning' || busy || id === 'imaging') return;
+    state.selectedTests = checked ? [...new Set([...state.selectedTests, id])] : state.selectedTests.filter((item) => item !== id);
+    renderTestsAndTimeline();
+    renderForecast();
+    persist(false).catch(console.error);
+  }
+
+  function togglePrediction(id) {
+    if (state.phase !== 'planning' || busy) return;
+    const selected = state.predictions.includes(id);
+    if (selected && state.predictions.length === 1) return toast('至少保留一项预测', '提交前需要明确至少一个方向性预测。');
+    state.predictions = selected ? state.predictions.filter((item) => item !== id) : [...state.predictions, id];
+    renderPredictions();
+    updateControlLocking();
+    persist(false).catch(console.error);
+  }
+
+  async function advance() {
+    if (busy || state.phase === 'completed') return;
+    busy = true;
+    renderHeader();
+    updateControlLocking();
+    try {
+      if (state.phase === 'planning') {
+        if (!state.hypotheses.length || !state.predictions.length) throw new Error('请先选择机制假设和方向性预测。');
+        state.run = await simulation.init({
+          caseData: content.caseData,
+          pathways: content.pathways,
+          pathwayId: state.pathwayId,
+          hypotheses: state.hypotheses,
+          selectedTests: state.selectedTests,
+          predictions: state.predictions,
+          seed: content.caseData.seed
+        });
+        state.phase = 'active';
+        state.events = [...state.run.events];
+        addEvent('clinical', '计划已提交', `路径锁定为 ${currentPathway().name}；研究性检测已订阅。`, 0);
+      }
+      const week = currentWeek();
+      const targetWeek = MILESTONES.find((item) => item > week);
+      if (!targetWeek) return;
+      const result = await simulation.advance({ run: state.run, pathways: content.pathways, targetWeek });
+      state.run = result.run;
+      state.events = [...result.run.events];
+      if (targetWeek === 8) {
+        state.phase = 'completed';
+        await prepareComparisons();
+      }
+      await persist(false);
+      renderAll();
+      showMilestone(result);
+    } catch (error) {
+      console.error(error);
+      toast('无法推进', error.message || '模拟发生错误。');
+    } finally {
+      busy = false;
+      renderHeader();
+      updateControlLocking();
+    }
+  }
+
+  function showMilestone(result) {
+    const week = result.run.currentWeek;
+    let label = `W${week} 暂停节点`;
+    let title = '重新形成判断';
+    let body = '';
+    if (week === 2) {
+      title = '研究性证据返回';
+      const evidence = result.evidence || result.run.state.evidence;
+      body = Object.entries(evidence || {}).map(([key, item]) => `<section class="recap-card"><strong>${key === 'ctdna' ? 'ctDNA 趋势' : 'B2M / MHC-I 面板'}</strong><p>${escapeHtml(item.status)}</p><p>${escapeHtml(item.confidence)} · ${escapeHtml(item.interpretation)}</p></section>`).join('');
+      body += '<div class="notice"><b>决策边界</b><span>研究性证据只能修正置信度，不会自动更换治疗路径。</span></div>';
+    } else if (week === 4) {
+      title = '安全复核';
+      const safety = result.safety || result.run.outcome?.safety;
+      body = `<section class="recap-card"><strong>${escapeHtml(safety.label)}</strong><p>${escapeHtml(safety.action)}</p><p>血液学耐受带：${escapeHtml(safety.marrowBand)}</p></section>`;
+    } else if (week === 6) {
+      title = '继续治疗前复核';
+      body = '<section class="recap-card"><strong>当前没有单一“正确答案”</strong><p>你可以修订机制假设，但已提交的治疗路径保持锁定。下一节点是 W8 分类影像评估。</p></section>';
+    } else if (week === 8) {
+      showRecap();
+      return;
+    }
+    $('#eventDialogLabel').textContent = label;
+    $('#eventDialogTitle').textContent = title;
+    $('#eventDialogBody').innerHTML = body;
+    $('#eventDialog').showModal();
+  }
+
+  function showRecap() {
+    const outcome = state.run?.outcome;
+    if (!outcome) return;
+    const cards = [
+      ['疾病控制', outcome.imaging, outcome.interpretation[0]],
+      ['生态风险', outcome.ecology, outcome.interpretation[1]],
+      ['治疗可持续性', outcome.sustainability, outcome.interpretation[2]],
+      ['关键安全事件', outcome.iraeEvent?.label || '未见显著免疫相关事件', outcome.iraeEvent?.action || '仍需按路径风险继续监测']
+    ];
+    $('#recapGrid').innerHTML = cards.map(([label, value, text]) => `<section class="recap-card"><span class="eyebrow">${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></section>`).join('');
+    const labels = new Map(content.caseData.predictions.map((item) => [item.id, item.label]));
+    $('#predictionReview').innerHTML = `<h3>预测复盘</h3>${state.predictions.map((id) => {
+      const supported = Boolean(outcome.predictionResults[id]);
+      return `<div class="prediction-result"><span>${escapeHtml(labels.get(id) || id)}</span><b class="${supported ? 'supported' : 'not-supported'}">${supported ? '得到支持' : '未得到支持 / 仍无法判断'}</b></div>`;
+    }).join('')}`;
+    $('#recapDialog').showModal();
+  }
+
+  async function prepareComparisons() {
+    const entries = await Promise.all(content.pathways.pathways.map(async (pathway) => {
+      if (pathway.id === state.pathwayId) return [pathway.id, clone(state.run)];
+      const run = await simulation.simulateComplete({
+        input: {
+          caseData: content.caseData,
+          pathways: content.pathways,
+          pathwayId: pathway.id,
+          hypotheses: state.hypotheses,
+          selectedTests: state.selectedTests,
+          predictions: state.predictions,
+          seed: content.caseData.seed
+        },
+        pathways: content.pathways
+      });
+      return [pathway.id, run];
+    }));
+    comparisonRuns = Object.fromEntries(entries);
+  }
+
+  async function refreshSaveList() {
+    const records = await window.CRC_STORAGE.list();
+    $('#saveList').innerHTML = records.length
+      ? records.map((record) => `<div class="save-record"><div><strong>${record.slot === AUTO_SLOT ? '自动存档' : escapeHtml(record.slot)}</strong><small>${formatDate(record.updatedAt)} · 校验 ${escapeHtml(record.checksum || '—')}</small></div><div class="save-record-actions"><button type="button" data-load-slot="${escapeHtml(record.slot)}">载入</button><button type="button" data-delete-slot="${escapeHtml(record.slot)}">删除</button></div></div>`).join('')
+      : '<p class="empty-state">尚无本地存档。</p>';
+  }
+
+  function download(filename, text, type = 'application/json') {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function exportSave() {
+    const text = window.CRC_STORAGE.exportText(state);
+    download(`crc-immune-frontier-save-${new Date().toISOString().slice(0, 10)}.json`, text);
+    toast('存档已导出', '文件包含游戏状态，不包含账号或真实患者数据。');
+  }
+
+  async function importSave(file) {
+    if (!file) return;
+    const text = await file.text();
+    const imported = window.CRC_STORAGE.importText(text);
+    state = sanitizeState(imported);
+    comparisonRuns = state.phase === 'completed' ? null : comparisonRuns;
+    await persist(false);
+    applyUiPreferences();
+    renderAll();
+    if (state.phase === 'completed') await prepareComparisons().then(renderCompare);
+    toast('存档已导入', `已恢复到 W${currentWeek()}。`);
+  }
+
+  async function resetCase() {
+    if (!window.confirm('确定重置当前病例吗？本地导出文件不会被删除。')) return;
+    await window.CRC_STORAGE.remove(AUTO_SLOT);
+    const preferences = state?.ui ? clone(state.ui) : null;
+    state = defaultState();
+    if (preferences) state.ui = { ...state.ui, ...preferences };
+    comparisonRuns = null;
+    $('#saveDialog').close();
+    enterApp();
+    toast('病例已重置', '已恢复固定种子和默认计划。');
+  }
+
+  function cycleTextScale() {
+    const values = ['normal', 'large', 'xlarge'];
+    const next = values[(values.indexOf(state.ui.textScale) + 1) % values.length];
+    state.ui.textScale = next;
+    applyUiPreferences();
+    requestAnimationFrame(renderMap);
+    persist(false).catch(console.error);
+    toast('字号已调整', next === 'normal' ? '舒适字号（桌面默认约 18–19px）。' : next === 'large' ? '大字号模式。' : '特大字号模式。');
+  }
+
+  function startLandingAnimation() {
+    const canvas = $('#landingCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const particles = Array.from({ length: 120 }, (_, index) => ({
+      angle: (index / 120) * Math.PI * 2,
+      radius: 65 + ((index * 47) % 230),
+      speed: 0.00025 + (index % 9) * 0.00004,
+      size: 2 + (index % 5),
+      type: index % 11
+    }));
+    const draw = (time = 0) => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (canvas.width !== Math.round(rect.width * dpr) || canvas.height !== Math.round(rect.height * dpr)) {
+        canvas.width = Math.max(500, Math.round(rect.width * dpr));
+        canvas.height = Math.max(400, Math.round(rect.height * dpr));
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const width = rect.width;
+      const height = rect.height;
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width * 0.5;
+      const centerY = height * 0.5;
+      const glow = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, Math.min(width, height) * 0.47);
+      glow.addColorStop(0, 'rgba(50,160,150,.22)');
+      glow.addColorStop(0.52, 'rgba(17,64,67,.34)');
+      glow.addColorStop(1, 'rgba(4,15,17,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, width, height);
+      particles.forEach((particle) => {
+        const motion = state?.ui?.reducedMotion ? 0 : time * particle.speed;
+        const x = centerX + Math.cos(particle.angle + motion) * particle.radius * (width / 760);
+        const y = centerY + Math.sin(particle.angle + motion) * particle.radius * 0.68 * (height / 620);
+        ctx.fillStyle = particle.type === 0 ? 'rgba(131,185,255,.78)' : particle.type < 4 ? 'rgba(255,141,131,.48)' : 'rgba(99,230,213,.44)';
+        ctx.beginPath();
+        ctx.arc(x, y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      if (!document.hidden && !$('#landing').classList.contains('is-hidden')) landingAnimation = requestAnimationFrame(draw);
+    };
+    cancelAnimationFrame(landingAnimation);
+    landingAnimation = requestAnimationFrame(draw);
+  }
+
+  function bindEvents() {
+    $('#reloadButton').addEventListener('click', () => location.reload());
+    $('#clearRecoveryButton').addEventListener('click', async () => {
+      await window.CRC_STORAGE.remove(AUTO_SLOT);
+      location.reload();
+    });
+    $('#newCaseButton').addEventListener('click', startNewCase);
+    $('#continueCaseButton').addEventListener('click', enterApp);
+    $('#homeLink').addEventListener('click', (event) => { event.preventDefault(); showLanding(); });
+    $('#landingTextButton').addEventListener('click', cycleTextScale);
+    $('#textScaleButton').addEventListener('click', cycleTextScale);
+    $('#advanceButton').addEventListener('click', advance);
+    $('#methodButton').addEventListener('click', () => $('#methodDialog').showModal());
+    $('#settingsButton').addEventListener('click', () => $('#settingsDialog').showModal());
+    $('#saveButton').addEventListener('click', async () => { await refreshSaveList(); $('#saveDialog').showModal(); });
+    $('#manualSaveButton').addEventListener('click', () => persist(true).then(refreshSaveList));
+    $('#exportSaveButton').addEventListener('click', exportSave);
+    $('#importSaveInput').addEventListener('change', (event) => importSave(event.target.files?.[0]).catch((error) => toast('导入失败', error.message)));
+    $('#resetCaseButton').addEventListener('click', resetCase);
+
+    $('#textScaleSelect').addEventListener('change', (event) => { state.ui.textScale = event.target.value; applyUiPreferences(); requestAnimationFrame(renderMap); persist(false); });
+    $('#contrastToggle').addEventListener('change', (event) => { state.ui.highContrast = event.target.checked; applyUiPreferences(); persist(false); });
+    $('#motionToggle').addEventListener('change', (event) => { state.ui.reducedMotion = event.target.checked; applyUiPreferences(); persist(false); });
+    $('#autosaveToggle').addEventListener('change', (event) => { state.ui.autosave = event.target.checked; applyUiPreferences(); persist(true); });
+
+    document.addEventListener('click', async (event) => {
+      const nav = event.target.closest('[data-view]');
+      if (nav) return showView(nav.dataset.view);
+      const pathway = event.target.closest('[data-pathway]');
+      if (pathway) return setPathway(pathway.dataset.pathway);
+      const hypothesis = event.target.closest('[data-hypothesis]');
+      if (hypothesis) return toggleHypothesis(hypothesis.dataset.hypothesis);
+      const prediction = event.target.closest('[data-prediction]');
+      if (prediction) return togglePrediction(prediction.dataset.prediction);
+      const filter = event.target.closest('[data-filter]');
+      if (filter) {
+        activeFilter = filter.dataset.filter;
+        $$('[data-filter]').forEach((button) => button.classList.toggle('is-active', button === filter));
+        return renderEvents();
+      }
+      const layer = event.target.closest('[data-layer]');
+      if (layer) {
+        state.ui.layer = layer.dataset.layer;
+        persist(false);
+        return renderMap();
+      }
+      const region = event.target.closest('[data-region]');
+      if (region) {
+        state.ui.regionIndex = Number(region.dataset.region);
+        persist(false);
+        return renderMap();
+      }
+      const loadSlot = event.target.closest('[data-load-slot]');
+      if (loadSlot) {
+        const loaded = await window.CRC_STORAGE.load(loadSlot.dataset.loadSlot);
+        if (loaded) {
+          state = sanitizeState(loaded.payload);
+          applyUiPreferences();
+          renderAll();
+          if (state.phase === 'completed') await prepareComparisons().then(renderCompare);
+          $('#saveDialog').close();
+          toast('存档已载入', `已恢复到 W${currentWeek()}。`);
+        }
+        return;
+      }
+      const deleteSlot = event.target.closest('[data-delete-slot]');
+      if (deleteSlot && window.confirm('删除这个本地存档吗？')) {
+        await window.CRC_STORAGE.remove(deleteSlot.dataset.deleteSlot);
+        return refreshSaveList();
+      }
+    });
+
+    document.addEventListener('change', (event) => {
+      const input = event.target.closest('[data-test]');
+      if (input) setTest(input.dataset.test, input.checked);
+    });
+
+    $('#ecologyCanvas').addEventListener('click', (event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      let best = 0;
+      let bestDistance = Infinity;
+      mapRegions.forEach((region, index) => {
+        const distance = Math.hypot(x - region.x * rect.width, y - region.y * rect.height);
+        if (distance < bestDistance) { best = index; bestDistance = distance; }
+      });
+      if (bestDistance < 60) {
+        state.ui.regionIndex = best;
+        persist(false);
+        renderMap();
+      }
+    });
+    $('#ecologyCanvas').addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      if (event.key === 'ArrowLeft') state.ui.regionIndex = (selectedRegionIndex - 1 + mapRegions.length) % mapRegions.length;
+      if (event.key === 'ArrowRight') state.ui.regionIndex = (selectedRegionIndex + 1) % mapRegions.length;
+      persist(false);
+      renderMap();
+    });
+
+    $('#eventDialog').addEventListener('close', () => {
+      if ($('#eventDialog').returnValue === 'evidence') showView('evidence');
+    });
+    $('#recapDialog').addEventListener('close', () => {
+      if ($('#recapDialog').returnValue === 'compare') showView('compare');
+    });
+    $('#eventEvidenceButton').addEventListener('click', () => { $('#eventDialog').close('evidence'); });
+
+    window.addEventListener('resize', () => {
+      if ($('#view-ecology').classList.contains('is-active')) requestAnimationFrame(renderMap);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !$('#landing').classList.contains('is-hidden')) startLandingAnimation();
+      else cancelAnimationFrame(landingAnimation);
+    });
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      installPrompt = event;
+      $('#installButton').hidden = false;
+    });
+    $('#installButton').addEventListener('click', async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      $('#installButton').hidden = true;
+    });
+  }
+
+  async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+    const registration = await navigator.serviceWorker.register('./sw.js');
+    registration.addEventListener('updatefound', () => {
+      const installing = registration.installing;
+      installing?.addEventListener('statechange', () => {
+        if (installing.state === 'installed' && navigator.serviceWorker.controller) $('#updateBanner').classList.remove('is-hidden');
+      });
+    });
+    $('#updateButton').addEventListener('click', () => {
+      registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+      location.reload();
+    });
+  }
+
+  async function bootstrap() {
+    try {
+      setBootMessage('载入版本化内容包……');
+      content = await window.CRC_CONTENT_LOADER.load();
+      setBootMessage('检查本地存档与迁移……');
+      const saved = await window.CRC_STORAGE.load(AUTO_SLOT);
+      state = sanitizeState(saved?.payload || defaultState());
+      applyUiPreferences();
+      simulation = createSimulationClient();
+      bindEvents();
+      if (state.phase === 'completed') await prepareComparisons();
+      $('#saveMetric').textContent = saved ? '可继续' : '新病例';
+      showLanding();
+      registerServiceWorker().catch((error) => console.warn('Service worker:', error));
+    } catch (error) {
+      showFatal(error);
+    }
+  }
+
+  window.addEventListener('error', (event) => {
+    if (!state) return;
+    console.error(event.error || event.message);
+    toast('页面发生错误', '已保留本地存档。可尝试刷新或导出存档。');
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error(event.reason);
+    if (state) toast('操作未完成', event.reason?.message || '发生未处理错误。');
+  });
+
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+  } else {
+    bootstrap();
+  }
+})();
+
+</script>
+</body>
+</html>

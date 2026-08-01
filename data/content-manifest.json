@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.08.01",
+  "appVersion": "1.0.0",
+  "status": "public-preview",
+  "defaultLocale": "zh-CN",
+  "medicalBaseline": "2026-08-01",
+  "cases": ["cases/case-b2m-escape.json"],
+  "pathways": "pathways.json",
+  "evidence": "evidence.json"
+}
