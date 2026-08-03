@@ -4,7 +4,7 @@ import { validateContent } from '../scripts/validate-content.mjs';
 
 test('versioned content bundle passes production validation', () => {
   const content = validateContent();
-  assert.equal(content.manifest.appVersion, '1.0.0');
+  assert.equal(content.manifest.appVersion, '0.7.0');
   assert.equal(content.manifest.status, 'public-preview');
   assert.equal(content.cases[0].assessmentWeek, 8);
   assert.equal(content.evidence.items.length >= 7, true);

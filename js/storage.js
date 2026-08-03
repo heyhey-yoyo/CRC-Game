@@ -31,7 +31,7 @@
     const schema = Number(raw.schemaVersion || payload.schemaVersion || 1);
     const migrated = schema === 1 ? { ...payload, schemaVersion: SAVE_SCHEMA, ui: payload.ui || {} } : { ...payload };
     migrated.schemaVersion = SAVE_SCHEMA;
-    if (!migrated.appVersion) migrated.appVersion = '1.0.0';
+    if (!migrated.appVersion) migrated.appVersion = '0.7.0';
     if (!migrated.caseId) migrated.caseId = 'case-b2m-escape';
     if (!migrated.updatedAt) migrated.updatedAt = new Date().toISOString();
     return migrated;

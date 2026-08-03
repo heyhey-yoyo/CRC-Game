@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 — Public Preview
+## 0.7.0 — Public Preview
 
 - Replaced the prototype outcome calculator with a deterministic Web Worker simulation using hidden six-hour ticks.
 - Added versioned JSON content, content validation and an evidence register.
@@ -11,4 +11,4 @@
 - Added larger desktop typography, three text sizes, high contrast, reduced motion and keyboard-accessible map alternatives.
 - Added offline PWA support, update notification, CSP/security headers, privacy/accessibility/methods/reference pages and a custom 404.
 - Added content, simulation, storage, static, build and browser smoke tests.
-- Added GitHub Actions CI and Cloudflare Pages deployment documentation.
+- Added Cloudflare Pages deployment documentation and Git-based CI-free publishing.

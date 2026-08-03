@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '0.7.0';
 const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}`;
 const APP_SHELL = [
   './',

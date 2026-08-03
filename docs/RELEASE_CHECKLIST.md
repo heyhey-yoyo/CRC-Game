@@ -1,4 +1,4 @@
-# v1.0.0 Public Preview 上线清单
+# v0.7.0 Public Preview 上线清单
 
 ## 必须完成
 
@@ -16,7 +16,7 @@
 - [ ] IndexedDB 存档、导出、导入、重置通过
 - [ ] 科学边界、隐私、参考资料页面可访问
 - [ ] 医学内容基线日期和证据卡一致
-- [ ] 创建带说明的 Git tag：`v1.0.0-public-preview`
+- [ ] 创建带说明的 Git tag：`v0.7.0-public-preview`
 
 ## 建议完成
 

@@ -1,7 +1,7 @@
 (function initSimulationEngine(scope) {
   'use strict';
 
-  const ENGINE_VERSION = '1.0.0';
+  const ENGINE_VERSION = '0.7.0';
   const TICKS_PER_DAY = 4;
   const DAYS_PER_WEEK = 7;
   const MILESTONES = Object.freeze([0, 2, 4, 6, 8]);

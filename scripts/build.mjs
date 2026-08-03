@@ -86,7 +86,7 @@ function makeStandalone() {
     .replace(/href="pages\/[^\"]+"/g, 'href="#" title="完整项目中提供该说明页面"')
     .replace(/href="icons\/[^\"]+"/g, 'href="#"')
     .replace(/content="\/icons\/icon-512\.png"/g, 'content=""');
-  const output = path.join(root, 'crc-immune-frontier-v1.0.0-standalone.html');
+  const output = path.join(root, 'crc-immune-frontier-v0.7.0-standalone.html');
   fs.writeFileSync(output, html);
   fs.copyFileSync(output, path.join(dist, 'standalone-demo.html'));
 }

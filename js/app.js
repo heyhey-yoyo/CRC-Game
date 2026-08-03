@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = '1.0.0';
+  const APP_VERSION = '0.7.0';
   const AUTO_SLOT = 'autosave';
   const MILESTONES = [0, 2, 4, 6, 8];
   const $ = (selector, root = document) => root.querySelector(selector);

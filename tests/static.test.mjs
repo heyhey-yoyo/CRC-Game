@@ -11,7 +11,7 @@ test('production files and public documentation exist', () => {
     'index.html', '404.html', 'styles.css', 'sw.js', 'manifest.webmanifest', '_headers', '_redirects',
     'js/app.js', 'js/sim-engine.js', 'js/sim-worker.js', 'js/storage.js',
     'pages/methods.html', 'pages/references.html', 'pages/privacy.html', 'pages/accessibility.html',
-    '.github/workflows/ci.yml', 'SECURITY.md', 'CONTRIBUTING.md', 'LICENSE'
+    'SECURITY.md', 'CONTRIBUTING.md', 'LICENSE'
   ];
   for (const file of required) assert.ok(fs.existsSync(path.join(root, file)), file);
 });
