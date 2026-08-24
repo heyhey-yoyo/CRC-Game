@@ -1,0 +1,14 @@
+node_modules/
+dist/
+# 构建产物（根目录 standalone 单文件与 checksums.txt，不入库）
+crc-immune-frontier-v*.html
+checksums.txt
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+coverage/
+test-results/
+playwright-report/
+*.zip

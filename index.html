@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071116">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="《肠境：免疫围城》是一款以不完全信息、治疗路径和肿瘤生态为核心的结直肠癌免疫策略教学游戏。">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="肠境：免疫围城">
+  <meta property="og:description" content="检测有限，时间有限，毒性有限。通过证据、机制假设和固定治疗路径理解肿瘤生态。">
+  <meta property="og:image" content="/icons/icon-512.png">
+  <title>肠境：免疫围城</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">跳到主要内容</a>
+
+  <section class="boot-screen" id="bootScreen" aria-live="polite">
+    <div class="boot-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1>正在载入病例内容</h1>
+    <p id="bootMessage">验证内容版本、存档与模拟引擎……</p>
+  </section>
+
+  <section class="fatal-screen is-hidden" id="fatalScreen" role="alert">
+    <div class="fatal-card">
+      <p class="eyebrow">无法安全启动</p>
+      <h1>内容或运行环境出现问题</h1>
+      <p id="fatalMessage">请重新载入页面。</p>
+      <div class="button-row">
+        <button class="button primary" id="reloadButton">重新载入</button>
+        <button class="button secondary" id="clearRecoveryButton">清除本地恢复数据</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing is-hidden" id="landing" aria-labelledby="landingTitle">
+    <div class="landing-noise" aria-hidden="true"></div>
+    <header class="landing-header">
+      <a class="brand" href="#" aria-label="返回首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>肠境：免疫围城</strong><small>CRC Immune Frontier</small></span>
+      </a>
+      <div class="landing-links">
+        <a href="pages/methods.html">方法与边界</a>
+        <a href="pages/references.html">证据来源</a>
+        <button class="text-button" id="landingTextButton" type="button" aria-label="调整字号">字号</button>
+      </div>
+    </header>
+
+    <main class="landing-main">
+      <div class="landing-copy">
+        <h1 id="landingTitle">检测有限，时间有限，<em>毒性有限。</em></h1>
+        <p class="landing-lead">你无法命令免疫细胞。你只能在不完整证据下提出假设、选择受约束的治疗路径，并判断短期控制是否掩盖了生态风险。</p>
+        <div class="button-row landing-actions">
+          <button class="button primary large" id="newCaseButton">开始新病例</button>
+          <button class="button secondary large is-hidden" id="continueCaseButton">继续本地病例</button>
+        </div>
+        <div class="boundary-strip" role="note">
+          <strong>教育与游戏用途</strong>
+          <span>不对应真实患者，不提供剂量、处方或疗效预测，也不能替代指南、MDT 或临床试验。</span>
+        </div>
+      </div>
+
+      <div class="landing-visual" aria-label="抽象肿瘤生态示意图">
+        <canvas id="landingCanvas" width="760" height="620"></canvas>
+        <div class="visual-caption"><span>●</span> 代表性生态剖面 · 非真实病理图像</div>
+      </div>
+    </main>
+
+    <footer class="landing-footer">
+      <span id="contentBaseline">医学内容基线：载入中</span>
+      <span>本地优先 · 无广告 · 无跟踪器</span>
+    </footer>
+  </section>
+
+  <div class="app-shell is-hidden" id="appShell">
+    <header class="topbar">
+      <a class="brand compact-brand" href="#" id="homeLink">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>肠境：免疫围城</strong><small>CRC Immune Frontier</small></span>
+      </a>
+      <div class="status-strip" aria-label="病例状态">
+        <div><span>节点</span><strong id="weekMetric">W0</strong></div>
+        <div><span>路径</span><strong id="pathMetric">未提交</strong></div>
+        <div><span>存档</span><strong id="saveMetric">准备中</strong></div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="installButton" type="button" hidden>安装</button>
+        <button class="icon-button" id="textScaleButton" type="button" aria-label="调整字号">A+</button>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="打开设置">设置</button>
+        <button class="icon-button" id="saveButton" type="button" aria-label="打开存档管理">存档</button>
+      </div>
+    </header>
+
+    <nav class="side-nav" aria-label="主要导航">
+      <button class="nav-button is-active" data-view="command"><span aria-hidden="true">⌁</span><b>指挥</b></button>
+      <button class="nav-button" data-view="ecology"><span aria-hidden="true">◉</span><b>生态</b></button>
+      <button class="nav-button" data-view="evidence"><span aria-hidden="true">▦</span><b>证据</b></button>
+      <button class="nav-button" data-view="compare"><span aria-hidden="true">⇄</span><b>比较</b></button>
+    </nav>
+
+    <main class="workspace" id="mainContent" tabindex="-1">
+      <section class="view is-active" id="view-command" aria-labelledby="commandTitle">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow" id="caseEyebrow">病例载入中</p>
+            <h2 id="commandTitle" tabindex="-1">病例指挥视图</h2>
+            <p id="caseSubtitle" class="view-subtitle"></p>
+          </div>
+          <div class="view-actions">
+            <button class="button secondary" id="methodButton">方法与边界</button>
+            <button class="button primary" id="advanceButton">提交计划并推进到 W2</button>
+          </div>
+        </div>
+
+        <div class="progress-rail" id="progressRail" aria-label="病例进度"></div>
+
+        <div class="command-grid">
+          <article class="panel case-panel">
+            <header class="panel-head"><div><span class="panel-index">A</span><h3>病例简报</h3></div><span class="badge clinical">虚构病例</span></header>
+            <div class="panel-body" id="caseBrief"></div>
+          </article>
+
+          <article class="panel hypothesis-panel">
+            <header class="panel-head"><div><span class="panel-index">B</span><h3>机制假设板</h3></div><span class="badge" id="hypothesisCount">1 / 3</span></header>
+            <p class="panel-note">选择 1–3 项当前最值得关注的瓶颈。暂停节点可修订，系统不会替你标出“正确答案”。</p>
+            <div class="hypothesis-list" id="hypothesisList"></div>
+          </article>
+
+          <article class="panel pathway-panel">
+            <header class="panel-head"><div><span class="panel-index">C</span><h3>治疗路径</h3></div><span class="badge clinical">固定模板</span></header>
+            <p class="panel-note">提交后路径锁定。游戏不显示真实剂量，也不允许逐日自由组合真实药物。</p>
+            <div class="pathway-list" id="pathwayList" role="radiogroup" aria-label="治疗路径"></div>
+            <div class="pathway-summary" id="pathwaySummary"></div>
+          </article>
+
+          <article class="panel evidence-plan-panel">
+            <header class="panel-head"><div><span class="panel-index">D</span><h3>证据与时间轴</h3></div><span class="badge research">临床 / 研究分层</span></header>
+            <div class="test-options" id="testOptions"></div>
+            <div class="timeline-scroll" tabindex="0" aria-label="横向滚动查看八周时间轴"><div class="timeline" id="timeline"></div></div>
+          </article>
+
+          <article class="panel prediction-panel">
+            <header class="panel-head"><div><span class="panel-index">E</span><h3>方向性预测</h3></div><span class="badge">预测承诺</span></header>
+            <p class="panel-note">提交前至少选择一项。复盘只比较方向是否被支持，不给出虚假精确概率。</p>
+            <div class="prediction-grid" id="predictionGrid"></div>
+            <div class="forecast" id="forecast"></div>
+          </article>
+
+          <article class="panel event-panel">
+            <header class="panel-head event-head"><div><span class="panel-index">F</span><h3>事件与推理记录</h3></div><div class="filter-group" aria-label="事件筛选"><button class="is-active" data-filter="all">全部</button><button data-filter="clinical">临床</button><button data-filter="research">研究</button><button data-filter="mechanism">机制</button></div></header>
+            <div class="event-list" id="eventList" aria-live="polite"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="view-ecology" aria-labelledby="ecologyTitle">
+        <div class="view-head"><div><p class="eyebrow">地图是证据，不是战场</p><h2 id="ecologyTitle" tabindex="-1">代表性生态剖面</h2><p class="view-subtitle">地图帮助解释空间接触、呈递与取样偏差；所有关键决策仍在指挥视图完成。</p></div></div>
+        <div class="ecology-layout">
+          <article class="panel map-panel">
+            <header class="panel-head"><div><span class="panel-index">M</span><h3>空间图层</h3></div><div class="layer-tabs"><button class="is-active" data-layer="cells">细胞</button><button data-layer="presentation">MHC-I</button><button data-layer="contact">CD8 接触</button><button data-layer="perfusion">灌注</button></div></header>
+            <canvas id="ecologyCanvas" width="960" height="600" tabindex="0" aria-label="抽象肿瘤生态地图。使用左右方向键切换代表区域，按回车查看。"></canvas>
+            <div class="region-buttons" id="regionButtons" aria-label="代表区域快捷选择"></div>
+          </article>
+          <aside class="panel inspector-panel">
+            <header class="panel-head"><div><span class="panel-index">I</span><h3>局部证据</h3></div></header>
+            <div class="panel-body" id="regionInspector"><p class="empty-state">选择一个代表区域查看局部证据。</p></div>
+            <div class="notice"><b>解释限制</b><span>代表性切片不能直接推断全病灶，也不能据此给出临床治疗建议。</span></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-evidence" aria-labelledby="evidenceTitle">
+        <div class="view-head"><div><p class="eyebrow">同一句话，可能来自不同证据层</p><h2 id="evidenceTitle" tabindex="-1">临床状态、机制证据与游戏抽象</h2><p class="view-subtitle">每项主张都显示用途边界和来源；内容基线以页面底部日期为准。</p></div></div>
+        <div class="evidence-grid" id="evidenceGrid"></div>
+      </section>
+
+      <section class="view" id="view-compare" aria-labelledby="compareTitle">
+        <div class="view-head"><div><p class="eyebrow">同种子教学性反事实</p><h2 id="compareTitle" tabindex="-1">按三维比较路径，而不是寻找总分最高</h2><p class="view-subtitle">比较使用相同隐藏病例种子，但仍是模型内反事实，不是临床疗效比较。</p></div></div>
+        <div class="panel compare-empty" id="compareEmpty"><h3>完成 W8 评估后开放</h3><p>系统将并列当前路径与另外两条路径，解释疾病控制、生态风险和治疗可持续性。</p></div>
+        <div class="compare-board is-hidden" id="compareBoard"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span id="footerVersion">内容载入中</span>
+      <span><a href="pages/privacy.html">隐私</a> · <a href="pages/accessibility.html">可访问性</a> · <a href="pages/references.html">参考资料</a></span>
+    </footer>
+  </div>
+
+  <dialog class="modal" id="eventDialog" aria-labelledby="eventDialogTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow" id="eventDialogLabel">关键节点</p><h2 id="eventDialogTitle">证据返回</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content" id="eventDialogBody"></div>
+      <footer><button class="button primary" value="close">返回并重新判断</button><button class="button secondary" value="evidence" id="eventEvidenceButton">查看证据卡</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal wide" id="recapDialog" aria-labelledby="recapDialogTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">W8 综合复盘</p><h2 id="recapDialogTitle">结果需要按三维解释</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content"><div class="recap-grid" id="recapGrid"></div><div class="prediction-review" id="predictionReview"></div></div>
+      <footer><button class="button primary" value="compare">查看路径比较</button><button class="button secondary" value="close">留在指挥视图</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="settingsDialog" aria-labelledby="settingsTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">显示与运行设置</p><h2 id="settingsTitle">设置</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content settings-list">
+        <label><span><strong>界面字号</strong><small>桌面默认已经放大；可再选择更大。</small></span><select id="textScaleSelect"><option value="normal">舒适</option><option value="large">大</option><option value="xlarge">特大</option></select></label>
+        <label><span><strong>高对比度</strong><small>增强边框和文字层级。</small></span><input type="checkbox" id="contrastToggle"></label>
+        <label><span><strong>减少动态</strong><small>关闭装饰动画和大部分过渡。</small></span><input type="checkbox" id="motionToggle"></label>
+        <label><span><strong>自动保存</strong><small>每个暂停节点保存到浏览器本地。</small></span><input type="checkbox" id="autosaveToggle" checked></label>
+      </div>
+      <footer><button class="button primary" value="close">完成</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal wide" id="saveDialog" aria-labelledby="saveTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">本地优先、可导出</p><h2 id="saveTitle">存档管理</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content">
+        <div class="save-toolbar"><button class="button primary" type="button" id="manualSaveButton">保存到自动槽</button><button class="button secondary" type="button" id="exportSaveButton">导出存档</button><label class="button secondary file-button">导入存档<input type="file" id="importSaveInput" accept="application/json"></label></div>
+        <div class="save-list" id="saveList"></div>
+        <div class="notice"><b>隐私</b><span>默认存档只保存在本机浏览器。项目不包含账号、广告、第三方分析或自动云上传。</span></div>
+      </div>
+      <footer><button class="button danger" type="button" id="resetCaseButton">重置当前病例</button><button class="button secondary" value="close">关闭</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="methodDialog" aria-labelledby="methodTitle">
+    <form method="dialog" class="modal-frame">
+      <header><div><p class="eyebrow">科学与游戏性的边界</p><h2 id="methodTitle">压缩时间，不伪造临床流程</h2></div><button class="icon-button" value="close" aria-label="关闭">×</button></header>
+      <div class="modal-content method-grid">
+        <div><b>临床事实</b><p>适应证、方案结构和重要毒性受公开证据约束。</p></div>
+        <div><b>机制证据</b><p>用方向性关系表达，不把相关性写成必然因果。</p></div>
+        <div><b>游戏抽象</b><p>八周被压缩为短局，Web Worker 内部使用隐藏六小时 tick。</p></div>
+        <div><b>禁止误导</b><p>不显示真实剂量、不允许任意联合、不生成患者建议。</p></div>
+      </div>
+      <footer><a class="button secondary" href="pages/methods.html">阅读完整说明</a><button class="button primary" value="close">了解</button></footer>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="update-banner is-hidden" id="updateBanner" role="status"><span>发现新版本。完成当前操作后可安全刷新。</span><button id="updateButton">刷新更新</button></div>
+
+  <noscript><div class="noscript">本游戏需要 JavaScript 才能运行。静态方法、隐私和参考资料页面仍可访问。</div></noscript>
+
+  <script src="js/content-loader.js" defer></script>
+  <script src="js/sim-engine.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

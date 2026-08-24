@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "accessed": "2026-08-01",
+  "items": [
+    {
+      "id": "fda-pembro-crc-2020",
+      "title": "FDA approves pembrolizumab for first-line treatment of MSI-H/dMMR colorectal cancer",
+      "organization": "U.S. Food and Drug Administration",
+      "date": "2020-06-29",
+      "url": "https://www.fda.gov/drugs/drug-approvals-and-databases/fda-approves-pembrolizumab-first-line-treatment-msi-hdmmr-colorectal-cancer",
+      "supports": ["pembrolizumab 一线路径", "q3w 或 q6w 标签给药间隔", "KEYNOTE-177"]
+    },
+    {
+      "id": "fda-nivo-ipi-crc-2025",
+      "title": "FDA approves nivolumab with ipilimumab for unresectable or metastatic MSI-H or dMMR colorectal cancer",
+      "organization": "U.S. Food and Drug Administration",
+      "date": "2025-04-08",
+      "url": "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-nivolumab-ipilimumab-unresectable-or-metastatic-msi-h-or-dmmr-colorectal-cancer",
+      "supports": ["双免疫适应证", "q3w 诱导后维持的标签结构", "CHECKMATE-8HW"]
+    },
+    {
+      "id": "dailymed-bevacizumab",
+      "title": "Bevacizumab prescribing information",
+      "organization": "DailyMed / U.S. National Library of Medicine",
+      "date": "current label reviewed 2026-08-01",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=bevacizumab",
+      "supports": ["mCRC 中与静脉氟尿嘧啶类化疗联合", "不把抗 VEGF 作为独立即时技能"]
+    },
+    {
+      "id": "irecist-2017",
+      "title": "iRECIST: guidelines for response criteria for use in trials testing immunotherapeutics",
+      "organization": "RECIST Working Group",
+      "date": "2017",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5648544/",
+      "supports": ["免疫治疗疑似进展需要后续确认的研究框架", "4–8 周确认窗口"]
+    },
+    {
+      "id": "asco-irae-2021",
+      "title": "Management of Immune-Related Adverse Events in Patients Treated With Immune Checkpoint Inhibitor Therapy",
+      "organization": "American Society of Clinical Oncology",
+      "date": "2021",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34724392/",
+      "supports": ["按器官系统与等级呈现 irAE", "观察、暂停和免疫抑制取决于严重度"]
+    },
+    {
+      "id": "b2m-msih-crc",
+      "title": "B2M mutation and checkpoint inhibitor outcome in MSI-H colorectal cancer",
+      "organization": "JCO Precision Oncology",
+      "date": "2019",
+      "url": "https://ascopubs.org/doi/10.1200/PO.18.00321",
+      "supports": ["B2M 异常不是稳定的必然无获益开关", "保留响应分布与不确定性"]
+    },
+    {
+      "id": "esmo-ctdna-2022",
+      "title": "ESMO recommendations on the use of circulating tumour DNA assays for patients with cancer",
+      "organization": "European Society for Medical Oncology",
+      "date": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35809752/",
+      "supports": ["ctDNA 的假阴性限制", "早期动态和耐药监测不应单独指导常规换药"]
+    }
+  ]
+}

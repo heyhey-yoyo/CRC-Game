@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "case-b2m-escape",
+  "title": "响应背后的异质性",
+  "subtitle": "MSI-H/dMMR 结直肠癌中的抗原呈递不确定性",
+  "durationMinutes": "20–30",
+  "seed": 2101,
+  "assessmentWeek": 8,
+  "clinicalFrame": {
+    "disease": "不可切除或转移性结直肠癌（教学性虚构病例）",
+    "known": ["MSI-H / dMMR 已确认", "基线影像可测量病灶", "既往治疗与合并症被简化"],
+    "unknown": ["B2M / MHC-I 异质性", "有效 CD8 接触", "低频克隆的纵向变化"],
+    "disclaimer": "病例不对应真实患者，不提供治疗建议，也不模拟真实剂量。"
+  },
+  "hypotheses": [
+    {"id": "presentation", "name": "抗原呈递异质性", "summary": "局部 B2M/MHC-I 改变可能降低部分 CD8 识别，但不等于必然免疫失败。", "evidenceTier": "临床观察 + 转化研究"},
+    {"id": "exhaustion", "name": "可逆疲惫仍占主导", "summary": "若可逆疲惫群体仍存在，检查点阻断可能恢复部分效应。", "evidenceTier": "机制与临床一致性"},
+    {"id": "spatial", "name": "有效接触不足", "summary": "总浸润不等于有效接触，间质、灌注与局部呈递共同影响杀伤。", "evidenceTier": "转化与前临床"},
+    {"id": "selection", "name": "治疗选择正在改变克隆构成", "summary": "优势克隆下降时，低频逃逸克隆的相对比例可能上升。", "evidenceTier": "生态模型 / 需纵向证据"}
+  ],
+  "tests": [
+    {"id": "ctdna", "name": "ctDNA 研究性趋势", "collectWeek": 0, "returnWeek": 2, "classification": "research", "limitations": ["低释放可导致假阴性", "不能单独决定换药", "只输出检出状态、趋势与置信度"]},
+    {"id": "b2m", "name": "B2M / MHC-I 组织面板", "collectWeek": 0, "returnWeek": 2, "classification": "translational", "limitations": ["仅代表取样区域", "基因、蛋白与表面表达可能不一致", "不是常规实时监测标准"]},
+    {"id": "imaging", "name": "分类影像评估", "collectWeek": 8, "returnWeek": 8, "classification": "clinical", "limitations": ["游戏不模拟 RECIST 尺寸测量", "免疫路径的疑似进展不自动等于确认进展"]}
+  ],
+  "predictions": [
+    {"id": "disease_control", "label": "W8 获得疾病控制", "dimension": "disease"},
+    {"id": "ecology_risk", "label": "呈递异质性风险上升", "dimension": "ecology"},
+    {"id": "ctdna_uncertain", "label": "ctDNA 仍不足以下定论", "dimension": "evidence"},
+    {"id": "toxicity", "label": "出现需要处理的毒性", "dimension": "treatment"}
+  ]
+}
