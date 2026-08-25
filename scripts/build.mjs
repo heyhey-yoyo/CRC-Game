@@ -17,7 +17,7 @@ const files = [
   'index.html', '404.html', 'styles.css', 'sw.js', 'manifest.webmanifest', '_headers', '_redirects', 'robots.txt',
   'js/content-loader.js', 'js/sim-engine.js', 'js/sim-worker.js', 'js/storage.js', 'js/app.js',
   'data/content-manifest.json', 'data/pathways.json', 'data/evidence.json', 'data/cases/case-b2m-escape.json',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
+  'icons/project-mark.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
   'pages/methods.html', 'pages/references.html', 'pages/privacy.html', 'pages/accessibility.html'
 ];
 

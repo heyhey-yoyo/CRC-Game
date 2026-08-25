@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <title>CRC Game</title><rect x="2" y="2" width="44" height="44" rx="4" fill="#24221f"/>
+  <path d="M12 12h24v24H12zM18 12v8h12v8h-8v8" fill="none" stroke="#f3eee5" stroke-width="2.4" stroke-linejoin="round"/>
+  <circle cx="18" cy="28" r="3.2" fill="#c15f3c"/><path d="m31 32 4 4m0-4-4 4" stroke="#c15f3c" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

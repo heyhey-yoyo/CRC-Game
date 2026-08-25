@@ -97,3 +97,8 @@ npm run release:check    # 全部串联：check → validate:content → test �
 ## 界面维护约定
 
 页面主体采用 `ydchen-portfolio` 的米白 / 赤陶色视觉系统；只调整视觉层，保持临床事实、机制证据、游戏抽象三类内容分离。
+
+
+## 标志维护约定
+
+项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
