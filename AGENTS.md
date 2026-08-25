@@ -93,3 +93,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 > - 遵守「临床事实 / 机制证据 / 游戏抽象」三类分离边界，禁止真实剂量与百分比数字
 > - 发布新版本同步更新四处版本字符串；`dist/`、`checksums.txt`、根目录 standalone 单文件是构建产物（均不入库，已被 `.gitignore` 忽略），改源码后须重跑 `npm run build`
 > - 上线前必须通过 `npm run release:check`
+
+## 界面维护约定
+
+页面主体采用 `ydchen-portfolio` 的米白 / 赤陶色视觉系统；只调整视觉层，保持临床事实、机制证据、游戏抽象三类内容分离。

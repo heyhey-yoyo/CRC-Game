@@ -408,3 +408,32 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .reference-item a { margin-top: .45rem; overflow-wrap: anywhere; font-size: .68rem; }
 .static-footer { padding: 1rem; border-top: 1px solid var(--line); color: var(--faint); text-align: center; font-size: .65rem; }
 @media (max-width:620px){.static-header{align-items:flex-start;flex-direction:column;padding:.8rem}.static-main{padding-top:2rem}.static-header nav{gap:.55rem}}
+/* Portfolio visual system: preserve game logic, canvas rendering, and evidence hierarchy. */
+:root{color-scheme:light;font-size:clamp(18px,0.35vw + 16px,19px);--bg:#f3eee5;--bg-deep:#ebe4d8;--surface:rgba(255,252,247,.86);--surface-2:#fbf8f2;--surface-3:#f0e8de;--line:rgba(36,34,31,.18);--line-strong:rgba(36,34,31,.3);--text:#24221f;--muted:#6f6a62;--faint:#938b80;--cyan:#c15f3c;--cyan-strong:#a94f31;--teal:#c15f3c;--amber:#a56b2b;--red:#b84a45;--blue:#8c6b5d;--clinical:#357b56;--research:#8c6b5d;--mechanism:#8e6b80;--shadow:0 14px 32px rgba(36,34,31,.06);--radius:0;--radius-sm:0}
+html,body{background:var(--bg);color:var(--text)}
+body{background:radial-gradient(circle at 80% -10%,rgba(193,95,60,.1),transparent 34%),var(--bg)}
+h1,h2,h3{font-family:Georgia,"Times New Roman","Songti SC","STSong",serif;font-weight:400}
+.landing{background:radial-gradient(circle at 75% 35%,rgba(193,95,60,.1),transparent 30%),linear-gradient(145deg,#f3eee5,#ebe4d8 72%);color:var(--text)}
+.landing-noise{opacity:.24;background-image:linear-gradient(rgba(36,34,31,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(36,34,31,.06) 1px,transparent 1px)}
+.landing-copy h1 em,.eyebrow,.visual-caption span{color:var(--cyan)}
+.landing-lead{color:var(--muted)}
+.landing-footer{color:var(--faint);border-color:var(--line)}
+.topbar{background:rgba(243,238,229,.94);border-color:var(--line);backdrop-filter:blur(14px)}
+.side-nav{background:rgba(235,228,216,.82);border-color:var(--line)}
+.workspace{background:transparent}
+.status-strip,.icon-button,.text-button,.progress-node,.fact,.hypothesis,.pathway,.test-option,.prediction,.timeline-event,.tool-card,.evidence-card,.panel,.fatal-card{background:rgba(255,252,247,.76);border-color:var(--line);border-radius:0;box-shadow:none}
+.panel-head{border-color:var(--line)}
+.nav-button:hover,.nav-button.is-active{background:rgba(193,95,60,.08);border-color:rgba(193,95,60,.28);color:var(--cyan)}
+.button{border-radius:0;box-shadow:none}
+.button.primary{background:var(--cyan);border-color:var(--cyan);color:var(--bg)}
+.button.secondary{background:transparent;color:var(--text);border-color:var(--line-strong)}
+.button.danger{background:rgba(184,74,69,.08);border-color:rgba(184,74,69,.35);color:var(--red)}
+.brand-mark{border-radius:0;background:var(--text);border-color:var(--line-strong);box-shadow:none}
+.brand-mark i{background:var(--cyan)}
+.progress-node.is-current,.hypothesis.is-selected,.pathway.is-selected,.prediction.is-selected{background:rgba(193,95,60,.08);border-color:rgba(193,95,60,.38);color:var(--cyan)}
+.panel-index,.pathway-code{border-radius:0;color:var(--cyan);border-color:var(--line-strong)}
+.badge{border-radius:0;background:var(--surface-3)}
+.static-header{background:rgba(243,238,229,.94);border-color:var(--line)}
+.static-header nav a{color:var(--muted)}
+.dialog-card{background:var(--surface-2);border-color:var(--line-strong);border-radius:0;box-shadow:none;color:var(--text)}
+@media(max-width:1050px){.landing-main{grid-template-columns:1fr}.landing-visual{min-height:360px}.landing-visual canvas{max-width:620px}}
