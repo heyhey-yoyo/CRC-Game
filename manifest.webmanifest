@@ -8,8 +8,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#071116",
-  "theme_color": "#071116",
+  "background_color": "#f3eee5",
+  "theme_color": "#f3eee5",
   "categories": ["games", "education", "medical"],
   "icons": [
     {"src": "icons/project-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"},

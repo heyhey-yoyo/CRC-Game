@@ -439,3 +439,20 @@ h1,h2,h3{font-family:Georgia,"Times New Roman","Songti SC","STSong",serif;font-w
 @media(max-width:1050px){.landing-main{grid-template-columns:1fr}.landing-visual{min-height:360px}.landing-visual canvas{max-width:620px}}
 .brand-mark{border-radius:0;background:var(--text) url("./icons/project-mark.svg") center/100% 100% no-repeat;border-color:var(--line-strong);box-shadow:none}
 .brand-mark i{display:none}
+
+/* Residual surface cleanup: warm UI surfaces with a neutral scientific canvas. */
+.visual-caption{background:rgba(251,248,242,.94);color:var(--text);border-color:var(--line-strong)}
+.visual-caption span{color:var(--cyan)}
+.panel,.evidence-card,.compare-card{background:var(--surface-2);color:var(--text)}
+.pathway-summary,.forecast-item{background:var(--surface-3);color:var(--muted)}
+.map-panel canvas{background:radial-gradient(circle at 50% 50%,#35312d,#272522 78%)}
+.modal{background:var(--surface-2);color:var(--text)}
+.modal::backdrop{background:rgba(36,34,31,.48)}
+.settings-list select{background:var(--surface-2);color:var(--text)}
+.toast{background:rgba(251,248,242,.97);color:var(--text)}
+.toast span{color:var(--muted)}
+.update-banner{background:var(--surface-2);color:var(--text)}
+.update-banner button{background:var(--cyan);color:#fff}
+.static-header{background:rgba(243,238,229,.94);color:var(--text)}
+.static-main p,.static-main li{color:var(--text)}
+.static-card,.reference-item{background:var(--surface-2);color:var(--text)}

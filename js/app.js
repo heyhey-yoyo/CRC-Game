@@ -456,9 +456,9 @@
     ctx.clearRect(0, 0, width, height);
 
     const gradient = ctx.createRadialGradient(width * 0.5, height * 0.48, 20, width * 0.5, height * 0.5, width * 0.48);
-    gradient.addColorStop(0, '#1a3a3f');
-    gradient.addColorStop(0.58, '#0d272c');
-    gradient.addColorStop(1, '#061214');
+    gradient.addColorStop(0, '#35312d');
+    gradient.addColorStop(0.58, '#2d2a27');
+    gradient.addColorStop(1, '#272522');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
@@ -774,9 +774,9 @@
       const centerX = width * 0.5;
       const centerY = height * 0.5;
       const glow = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, Math.min(width, height) * 0.47);
-      glow.addColorStop(0, 'rgba(50,160,150,.22)');
-      glow.addColorStop(0.52, 'rgba(17,64,67,.34)');
-      glow.addColorStop(1, 'rgba(4,15,17,0)');
+      glow.addColorStop(0, 'rgba(193,95,60,.18)');
+      glow.addColorStop(0.52, 'rgba(83,70,61,.28)');
+      glow.addColorStop(1, 'rgba(39,37,34,0)');
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, width, height);
       particles.forEach((particle) => {
