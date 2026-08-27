@@ -16,7 +16,7 @@
 - Web Worker 模拟：`js/sim-worker.js` 经 `importScripts` 加载引擎，消息协议 `INIT / ADVANCE / SIMULATE_COMPLETE`（12s 超时，失败自动降级主线程直调）
 - 持久化三级降级：IndexedDB → localStorage → 内存（`js/storage.js`，schema 2，FNV-1a 32 位 checksum）
 - PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0`（导航 network-first、静态 cache-first）+ manifest + 更新横幅
-- 测试：Node 内置 `node --test` + Python Playwright Chromium smoke test
+- 测试：Node 内置 `node --test` + 项目内 Node Playwright Chromium smoke test
 
 ## 仓库结构
 
@@ -45,6 +45,7 @@ npm run check            # 语法检查 7 个文件
 npm run validate:content # 内容包校验
 npm test                 # Node 单元测试
 npm run build            # 生产构建（SITE_URL=https://你的域名 npm run build）
+npm run test:browser:install # 首次下载 Chromium（不属于生产构建）
 npm run test:browser     # Playwright 冒烟（须先 build，用 dist/standalone-demo.html）
 npm run release:check    # 全部串联：check → validate:content → test → build → test:browser
 ```
@@ -56,7 +57,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `simulation.test.mjs`：同 seed 同计划结果确定性、发布病例 seed 2101 的 B2M 性状、ctDNA 可检出/假阴性且永不输出精确百分比、路径排期
 - `content.test.mjs`：内容包校验 + 三字段分离；`storage.test.mjs`：checksum 稳定性、schema 迁移、篡改检测
 - `static.test.mjs`：必需文件、CSS 排印/网格、安全头 token、SW 行为；`link.test.mjs`：本地链接完整性
-- `browser-smoke.py`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
+- `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
 
 ## 部署
 

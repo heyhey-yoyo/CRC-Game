@@ -9,11 +9,15 @@
     "check": "node --check js/content-loader.js && node --check js/sim-engine.js && node --check js/sim-worker.js && node --check js/storage.js && node --check js/app.js && node --check sw.js && node --check scripts/build.mjs && node --check scripts/validate-content.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "python3 tests/browser-smoke.py",
+    "test:browser": "playwright test --config playwright.config.mjs",
+    "test:browser:install": "playwright install chromium",
     "build": "node scripts/build.mjs",
     "release:check": "npm run check && npm run validate:content && npm test && npm run build && npm run test:browser"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0"
   }
 }

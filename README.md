@@ -27,7 +27,7 @@
 
 ## 本地检查
 
-需要 Node.js 20 或更高版本。浏览器测试还需要 Python 3 与 Playwright。
+需要 Node.js 20 或更高版本。浏览器测试使用项目内固定版本的 Playwright。
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
@@ -37,11 +37,11 @@ npm test
 npm run build
 ```
 
-安装浏览器测试依赖后：
+首次运行浏览器测试时：
 
 ```bash
-python -m pip install -r requirements-dev.txt
-python -m playwright install chromium
+npm install
+npm run test:browser:install
 npm run test:browser
 ```
 
