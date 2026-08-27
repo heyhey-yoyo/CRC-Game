@@ -58,6 +58,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `content.test.mjs`：内容包校验 + 三字段分离；`storage.test.mjs`：checksum 稳定性、schema 迁移、篡改检测
 - `static.test.mjs`：必需文件、CSS 排印/网格、安全头 token、SW 行为；`link.test.mjs`：本地链接完整性
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
+- `browser-smoke.py` 与 `requirements-dev.txt`：保留的历史兼容参考；默认脚本、发布门禁和 Cloudflare 构建**不得**重新依赖 Python 测试环境。
 
 ## 部署
 

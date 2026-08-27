@@ -40,10 +40,11 @@ npm run build
 首次运行浏览器测试时：
 
 ```bash
-npm install
 npm run test:browser:install
 npm run test:browser
 ```
+
+旧的 Python 冒烟脚本与其依赖清单仅作为兼容参考保留；默认质量门禁和 Cloudflare 构建只使用上述项目内的 Node/Playwright 流程。
 
 完整发布检查：
 
