@@ -18,7 +18,7 @@
 - PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0`（导航 network-first、静态 cache-first）+ manifest + 更新横幅
 - 测试：Node 内置 `node --test` + 项目内 Node Playwright Chromium smoke test
 
-## 仓库结构
+## 项目结构
 
 | 路径 | 作用 |
 | --- | --- |
@@ -60,10 +60,20 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
 - `browser-smoke.py` 与 `requirements-dev.txt`：保留的历史兼容参考；默认脚本、发布门禁和 Cloudflare 构建**不得**重新依赖 Python 测试环境。
 
+## 代码组织与风格约定
+
+- 分层架构：内容层 `data/`（JSON 唯一内容源）→ 模拟层 `js/sim-engine.js`（纯逻辑、确定性）→ 状态层 `js/storage.js` → 展示层 `js/app.js` → 离线层 `sw.js`
+- 模块用 `(function initX(scope){...})(window/self/globalThis)` IIFE + `module.exports` 双导出，浏览器/Worker/Node 测试三处共用
+- 内容与引擎严格分离：新病例 = 新 `data/cases/*.json` + manifest 指针，引擎不改
+- 确定性：`mulberry32(seed)`，隐藏性状由 `deriveHiddenTraits(seed)` 派生；`advanceRun` 拒绝倒退；**任何改变结果/迁移/校验的行为必须加固定种子回归测试**
+- 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
+- UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
+- **版本一致性**：`0.7.0` 出现在 `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）——发布新版本需同步更新
+
 ## 部署
 
 - Cloudflare Pages Git 集成：Production branch `main`，Build command `npm run build`，输出目录 `dist`，环境变量 `SITE_URL=https://正式域名`
-- **无 GitHub Actions**（已删除，README 目录树提到 `.github/workflows/` 是过时信息，不要据此创建）
+- **无 GitHub Actions**：本项目不使用 CI，不要新增 `.github/workflows/`
 - 回滚三种方式见 `docs/ROLLBACK.md`（Dashboard 回滚 / git revert / 直接上传）；内容包可单独回滚
 - 上线前过 `docs/RELEASE_CHECKLIST.md`；版本 tag `v0.7.0`
 
@@ -75,15 +85,13 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - 无后端、无账号、无第三方追踪；存档只存本机浏览器，只有用户主动导出才产生文件
 - **无真实患者数据**：SECURITY.md 与 MEDICAL_BOUNDARIES.md 明令禁止存档/报告中出现真实临床信息（注意 SECURITY.md 的 "1.x" 表述已过时，当前 0.7.0）
 
-## 代码组织与风格约定
+## 界面维护约定
 
-- 分层架构：内容层 `data/`（JSON 唯一内容源）→ 模拟层 `js/sim-engine.js`（纯逻辑、确定性）→ 状态层 `js/storage.js` → 展示层 `js/app.js` → 离线层 `sw.js`
-- 模块用 `(function initX(scope){...})(window/self/globalThis)` IIFE + `module.exports` 双导出，浏览器/Worker/Node 测试三处共用
-- 内容与引擎严格分离：新病例 = 新 `data/cases/*.json` + manifest 指针，引擎不改
-- 确定性：`mulberry32(seed)`，隐藏性状由 `deriveHiddenTraits(seed)` 派生；`advanceRun` 拒绝倒退；**任何改变结果/迁移/校验的行为必须加固定种子回归测试**
-- 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
-- UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
-- **版本一致性**：`0.7.0` 出现在 `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）——发布新版本需同步更新
+页面主体采用 `ydchen-portfolio` 的米白 / 赤陶色视觉系统；只调整视觉层，保持临床事实、机制证据、游戏抽象三类内容分离。
+
+## 标志维护约定
+
+项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
 
 ---
 
@@ -95,12 +103,3 @@ npm run release:check    # 全部串联：check → validate:content → test �
 > - 遵守「临床事实 / 机制证据 / 游戏抽象」三类分离边界，禁止真实剂量与百分比数字
 > - 发布新版本同步更新四处版本字符串；`dist/`、`checksums.txt`、根目录 standalone 单文件是构建产物（均不入库，已被 `.gitignore` 忽略），改源码后须重跑 `npm run build`
 > - 上线前必须通过 `npm run release:check`
-
-## 界面维护约定
-
-页面主体采用 `ydchen-portfolio` 的米白 / 赤陶色视觉系统；只调整视觉层，保持临床事实、机制证据、游戏抽象三类内容分离。
-
-
-## 标志维护约定
-
-项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
