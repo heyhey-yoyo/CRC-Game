@@ -1,10 +1,10 @@
-# 肠境：免疫围城 — AI 代理工作指南
+# 肠境：免疫围城 — 项目说明（供 AI 编程代理阅读）
 
 本文件供 AI 编码代理使用。修改代码前请先阅读本文件。
 
 ## 项目概览
 
-可部署到 Cloudflare Pages 的纯静态教育策略游戏（v0.7.0 Public Preview）。玩家在不完整证据下形成机制假设（最多 3 个）、选择受约束的治疗路径（pembro / nivoipi / folfoxbev），并在 W2 / W4 / W6 / W8 事件节点重新判断疾病控制、生态风险和治疗可持续性；W8 后做三维复盘与同种子反事实路径比较。
+可部署到 Cloudflare Pages 的纯静态教育策略游戏（Public Preview）。玩家在不完整证据下形成机制假设（最多 3 个）、选择受约束的治疗路径（pembro / nivoipi / folfoxbev），并在 W2 / W4 / W6 / W8 事件节点重新判断疾病控制、生态风险和治疗可持续性；W8 后做三维复盘与同种子反事实路径比较。
 
 当前内容范围：仅一个病例 `case-b2m-escape`（MSI-H/dMMR 结直肠癌中 B2M/MHC-I 抗原呈递异质性），20–30 分钟，固定种子 2101。
 
@@ -15,13 +15,21 @@
 - 原生 HTML/CSS/JS，零运行时依赖，无框架、无打包器
 - Web Worker 模拟：`js/sim-worker.js` 经 `importScripts` 加载引擎，消息协议 `INIT / ADVANCE / SIMULATE_COMPLETE`（12s 超时，失败自动降级主线程直调）
 - 持久化三级降级：IndexedDB → localStorage → 内存（`js/storage.js`，schema 2，FNV-1a 32 位 checksum）
-- PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0`（导航 network-first、静态 cache-first）+ manifest + 更新横幅
+- PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0-visual-2`（`CACHE_NAME` 由 `APP_VERSION` 拼接 `-visual-N` 后缀；导航 network-first、静态 cache-first）+ manifest + 更新横幅
 - 测试：Node 内置 `node --test` + 项目内 Node Playwright Chromium smoke test
 
 ## 项目结构
 
 | 路径 | 作用 |
 | --- | --- |
+| `index.html` | 游戏入口页面 |
+| `styles.css` | 全部样式 |
+| `sw.js` | Service Worker：版本化离线缓存（导航 network-first、静态 cache-first） |
+| `manifest.webmanifest` | PWA 清单 |
+| `404.html` | 自定义 404 页面 |
+| `_headers` / `_redirects` | Cloudflare Pages 安全响应头与重定向规则 |
+| `robots.txt` | 搜索引擎抓取规则（构建时按 SITE_URL 重写） |
+| `icons/` | PWA 与页面图标 |
 | `data/content-manifest.json` | 内容清单（schemaVersion 1，contentVersion，medicalBaseline） |
 | `data/pathways.json` | 3 条路径（周排期/模型参数），约束：无真实剂量 |
 | `data/evidence.json` | 7 条证据记录（组织/日期/URL/supports） |
@@ -29,13 +37,19 @@
 | `js/sim-engine.js` | 确定性纯逻辑引擎（mulberry32 PRNG、隐藏性状、tickRun、事件节点结果） |
 | `js/sim-worker.js` | Web Worker 消息处理 |
 | `js/storage.js` | 存档：三级降级、schema 迁移、checksum、导入导出 |
-| `js/app.js` | 主控制器（978 行）：状态编排、渲染、事件委托、Canvas 生态地图 |
+| `js/app.js` | 主控制器：状态编排、渲染、事件委托、Canvas 生态地图 |
 | `js/content-loader.js` | 按 manifest 加载并校验内容（支持内嵌模式） |
 | `pages/` | methods / references / privacy / accessibility 静态说明页 |
 | `scripts/build.mjs` | 生产构建：清空重建 dist/、SITE_URL 时生成 sitemap/canonical、standalone 单文件、checksums.txt |
 | `scripts/validate-content.mjs` | 内容校验（build 与测试共用） |
 | `tests/` | 7 个测试文件（模拟/内容/存档/静态/链接/构建 + Playwright smoke） |
 | `docs/` | ARCHITECTURE、DEPLOYMENT、MEDICAL_BOUNDARIES、RELEASE_CHECKLIST、ROLLBACK 等 |
+| `package.json` / `package-lock.json` | npm 脚本、版本常量与锁定依赖（无运行时依赖） |
+| `playwright.config.mjs` | 浏览器冒烟测试配置 |
+| `requirements-dev.txt` | 历史 Python 冒烟脚本依赖（仅兼容参考） |
+| `LICENSE` / `CONTENT-LICENSE.md` | 程序 MIT / 原创内容与机制文档 CC BY 4.0 |
+| `CHANGELOG.md` / `CONTRIBUTING.md` / `CODE_OF_CONDUCT.md` / `SECURITY.md` | 变更记录、贡献指南、行为准则与安全政策 |
+| `.gitignore` | 忽略构建产物（`dist/`、`checksums.txt`、standalone 单文件等） |
 
 ## 运行与构建
 
@@ -75,7 +89,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - Cloudflare Pages Git 集成：Production branch `main`，Build command `npm run build`，输出目录 `dist`，环境变量 `SITE_URL=https://正式域名`
 - **无 GitHub Actions**：本项目不使用 CI，不要新增 `.github/workflows/`
 - 回滚三种方式见 `docs/ROLLBACK.md`（Dashboard 回滚 / git revert / 直接上传）；内容包可单独回滚
-- 上线前过 `docs/RELEASE_CHECKLIST.md`；版本 tag `v0.7.0`
+- 上线前过 `docs/RELEASE_CHECKLIST.md`；版本 tag 与 GitHub Release 对齐
 
 ## 安全与数据注意事项
 
@@ -91,7 +105,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 
 ## 标志维护约定
 
-项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
+项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `icons/project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
 
 ---
 
