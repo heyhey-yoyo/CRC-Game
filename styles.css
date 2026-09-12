@@ -482,7 +482,7 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 .reference-item span { margin-top: .15rem; color: var(--muted); font-size: var(--size-meta); }
 .reference-item a { margin-top: .45rem; overflow-wrap: anywhere; font-size: var(--size-meta); }
 .static-footer { padding: 1rem; border-top: 1px solid var(--line); color: var(--faint); text-align: center; font-size: var(--size-meta); }
-@media (max-width:620px){.static-header{align-items:flex-start;flex-direction:column;padding:.8rem}.static-main{padding-top:2rem}.static-header nav{gap:.55rem}}
+@media (max-width:620px){.static-header{flex-wrap:wrap}.static-main{padding-top:2rem}.static-header nav{gap:.55rem}}
 html{background:var(--bg);color:var(--text)}
 body{color:var(--text)}
 body{background:radial-gradient(circle at 80% -10%,rgba(169,79,49,.1),transparent 34%),var(--bg)}
@@ -565,14 +565,16 @@ body{font-family:var(--type-body);font-size:var(--size-body);line-height:1.6}
 
 /* 普通项目品牌页眉：中文衬线标题＋英文副标题＋方章。 */
 :is(.landing-header,.topbar,.static-header){background:rgba(243,238,229,.94);border-bottom:1px solid rgba(36,34,31,.18);box-sizing:border-box}
-:is(.landing-header,.topbar,.static-header){display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px;height:auto;max-width:1440px;width:100%;margin-inline:auto;padding:11px var(--brand-pad)}
+:is(.landing-header,.topbar,.static-header){display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px;height:auto;max-width:1280px;width:100%;margin-inline:auto;padding:11px 16px}
 :is(.landing-header,.topbar,.static-header) .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:0 1 auto;text-align:left;padding:0;margin:0;background:transparent;border:0}
 :is(.landing-header,.topbar,.static-header) .brand strong{display:block;font-family:var(--type-heading);font-size:18px;font-weight:400;line-height:1.3;letter-spacing:-.02em;color:var(--brand-ink);margin:0;white-space:normal}
 :is(.landing-header,.topbar,.static-header) .brand small{display:block;font-family:var(--type-body);font-size:12px;font-weight:400;line-height:1.4;letter-spacing:.05em;color:var(--brand-muted);margin:2px 0 0}
 :is(.landing-header,.topbar,.static-header) .brand-mark{display:block;flex:0 0 48px;width:48px;height:48px;border:0;border-radius:0}
 :is(.landing-header,.topbar,.static-header) :is(a,button):not(.brand):not(.brand-v9){font-family:var(--type-body);font-size:15px;line-height:1.5}
-@media(max-width:640px){:is(.landing-header,.topbar,.static-header){min-height:64px;gap:12px;padding:11px 16px;flex-wrap:wrap}:is(.landing-header,.topbar,.static-header) .brand strong{font-size:16px}:is(.landing-header,.topbar,.static-header) .brand-mark{width:40px;height:40px;flex-basis:40px}:is(.landing-header,.topbar,.static-header) :is(a,button):not(.brand):not(.brand-v9){font-size:14px}}.landing-header{width:100%;max-width:none}.evidence-card footer a{color:var(--cyan-strong)}
+@media(max-width:640px){:is(.landing-header,.topbar,.static-header){min-height:64px;gap:12px;padding:11px 16px;flex-wrap:wrap}:is(.landing-header,.topbar,.static-header) .brand strong{font-size:16px}:is(.landing-header,.topbar,.static-header) .brand-mark{width:40px;height:40px;flex-basis:40px}:is(.landing-header,.topbar,.static-header) :is(a,button):not(.brand):not(.brand-v9){font-size:14px}}.evidence-card footer a{color:var(--cyan-strong)}
 
 .progress-node.is-current{color:#823a25}.badge.clinical{color:#286641}
 
 .badge.research{color:#70554a}
+
+:is(.landing-header,.topbar,.static-header) > :last-child{margin-left:auto}
