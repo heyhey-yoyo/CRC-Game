@@ -2,7 +2,7 @@
 
 ## Supported version
 
-Security fixes are applied to the current `1.x` public-preview branch.
+Security fixes target the current public-preview application on `main` and the latest published release. Do not infer a supported major version from an old branch label.
 
 ## Reporting
 

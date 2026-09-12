@@ -15,7 +15,7 @@
 - 原生 HTML/CSS/JS，零运行时依赖，无框架、无打包器
 - Web Worker 模拟：`js/sim-worker.js` 经 `importScripts` 加载引擎，消息协议 `INIT / ADVANCE / SIMULATE_COMPLETE`（12s 超时，失败自动降级主线程直调）
 - 持久化三级降级：IndexedDB → localStorage → 内存（`js/storage.js`，schema 2，FNV-1a 32 位 checksum）
-- PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0-visual-3`（`CACHE_NAME` 由 `APP_VERSION` 拼接 `-visual-N` 后缀；导航 network-first、静态 cache-first）+ manifest + 更新横幅
+- PWA：`sw.js` 按 `APP_VERSION` 与视觉后缀定义缓存基础名；生产构建附加样式内容摘要，并同步全部页面样式 URL 与 Service Worker 预缓存，导航 network-first、静态 cache-first。修改后以 `dist/sw.js` 和 `dist/build-info.json` 为实际部署依据。
 - 测试：Node 内置 `node --test` + 项目内 Node Playwright Chromium smoke test
 
 ## 项目结构
@@ -74,6 +74,12 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
 - `browser-smoke.py` 与 `requirements-dev.txt`：保留的历史兼容参考；默认脚本、发布门禁和 Cloudflare 构建**不得**重新依赖 Python 测试环境。
 
+维护回归入口（各项通过后仍需按改动范围验证浏览器关键路径）：
+
+```bash
+npm run release:check
+```
+
 ## 代码组织与风格约定
 
 - 分层架构：内容层 `data/`（JSON 唯一内容源）→ 模拟层 `js/sim-engine.js`（纯逻辑、确定性）→ 状态层 `js/storage.js` → 展示层 `js/app.js` → 离线层 `sw.js`
@@ -83,6 +89,24 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
 - UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
 - **版本一致性**：`0.7.0` 出现在 `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）——发布新版本需同步更新
+
+本项目为普通项目类。页眉桌面 72px、手机（≤640px）64px；方章 48×48px / 40×40px，标题衬线 18px/400/1.3、手机 16px，副标题无衬线 12px/400/1.4；标志与标题间距 12px，标题与副标题间距 2px。
+
+页眉内容区最大宽度 1280px（含两侧各 16px 内边距），整体居中；品牌和标题靠左，操作区靠右，窄屏换行后仍保持该对齐。品牌页眉在文档顶部正常排布，随页面滚走，不固定或吸顶；表格内部表头、侧边工具和手机底部导航可按功能保留。
+
+正文采用统一系统无衬线字体，默认 16px / 1.6；标题采用 Georgia、Times New Roman、Songti SC、STSong 衬线族。数字与代码可使用 SFMono-Regular、Consolas、Liberation Mono、Microsoft YaHei 等宽族。按钮和输入通常 15px，辅助文字 12–14px，密集科学数据允许有理由的局部调整。页面底色 #f3eee5、正文 #24221f、赤陶强调 #a94f31，柔和底色上的强调文字 #823a25；科学分类色、热图、作品主题与状态色保留必要区分度。
+
+主样式保留一个顶层 `:root`，条件规则和深色画布局部令牌独立维护，不再叠加整套旧深色主题与末尾浅色覆盖。修改视觉后核对实际渲染字体、字号、间距、对比度和操作可达性；至少检查 1440、820、390px，涉及断点时补查两侧宽度，涉及画布或存储时补查交互。构建、单测、本地浏览器和线上部署分别记录；发布后禁用缓存/硬刷新，并核对实际资源版本。
+
+页面以单一浅色根变量定义主题，移动端不能仅靠隐藏横向溢出来通过验收；粒子仅改外观，不改模拟状态。
+
+更新按钮先监听 controllerchange，再发 SKIP_WAITING；8 秒定时器仅提示，不得强制刷新。通信失败或 waiting worker 进入 redundant 时解除忙碌状态。浏览器用例覆盖慢速接管、一次性刷新和失败重试；缓存标识同步提升。
+
+更新按钮仅在新版 Service Worker 实际接管后刷新；超过 8 秒只提示等待，通信失败可重试。证据卡与辅助文字提高对比度，方法页和游戏页共用品牌页眉。导出链接延迟回收；新增真实界面存档重载、同文件二次导入及更新竞态浏览器测试。
+
+生产构建为样式链接附加内容摘要，并同步 Service Worker 预缓存地址和缓存名，避免 CDN 同名旧样式残留；独立 HTML 仍内嵌样式。构建回归覆盖全部说明页和离线资源一致性。
+
+游戏工作区去掉固定页眉占位，桌面侧边导航独立布局；手机底部导航保持可用。
 
 ## 部署
 
@@ -108,39 +132,6 @@ npm run release:check    # 全部串联：check → validate:content → test �
 项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `icons/project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
 
 ---
-
-## 2026-09-13 维护补充
-
-页面以单一浅色根变量定义主题，移动端不能仅靠隐藏横向溢出来通过验收；粒子仅改外观，不改模拟状态。
-
-## 问题闭环维护
-
-更新按钮先监听 controllerchange，再发 SKIP_WAITING；8 秒定时器仅提示，不得强制刷新。通信失败或 waiting worker 进入 redundant 时解除忙碌状态。浏览器用例覆盖慢速接管、一次性刷新和失败重试；缓存标识同步提升。
-
-
-## 跨项目视觉与回归基准（2026-09-13）
-
-本项目归类为 **普通项目**。72px / 64px 页眉，48px / 40px 方章，18px / 16px 衬线标题，12px 无衬线副标题。 正文采用统一系统无衬线字体、默认 16px / 1.6；标题使用衬线层级，数字与代码可使用统一等宽族。辅助文字通常为 12–14px，密集科学数据可按实际场景调整。主界面延续米白与赤陶 #a94f31，柔和色块上的文字用更深色保证可读性。
-
-更新按钮仅在新版 Service Worker 实际接管后刷新；超过 8 秒只提示等待，通信失败可重试。证据卡与辅助文字提高对比度，方法页和游戏页共用品牌页眉。导出链接延迟回收；新增真实界面存档重载、同文件二次导入及更新竞态浏览器测试。
-
-当前检查命令：
-
-```bash
-npm run release:check
-```
-
-本节为当前视觉维护基准，替代此前分散的字号、页眉尺寸和 QA 颜色例外；不要重新添加全局深色主题与末尾浅色覆盖。保留一个顶层 `:root`，条件规则和深色图形舞台局部令牌保持独立。修改后至少核验 1440、820、390px，涉及断点、图表或存储时补查相应交互。构建、单测、浏览器本地和线上部署是不同验收层次，记录其实际范围。
-
-## 页眉滚动行为更新
-
-生产构建为样式链接附加内容摘要，并同步 Service Worker 预缓存地址和缓存名，避免 CDN 同名旧样式残留；独立 HTML 仍内嵌样式。构建回归覆盖全部说明页和离线资源一致性。
-
-品牌页眉位于文档顶部，随页面正常滚走，不使用 fixed/sticky 吸顶；字体、字号、标志尺寸和三类排布基准保持一致。 游戏工作区去掉固定页眉占位，桌面侧边导航独立布局；手机底部导航保持可用。
-
-## 页眉水平对齐
-
-页眉内容区最大宽度统一为 1280px（含两侧各 16px 留白），整体居中；标志和标题靠左，操作区靠右，窄屏可换行。保持本类字体、字号与标志尺寸，页眉随文档滚走。本约定替代旧的 1440px 页眉和随视口变化的横向留白。
 
 ## AI 维护提醒
 
