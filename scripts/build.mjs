@@ -28,6 +28,24 @@ for (const relative of files) {
   fs.copyFileSync(source, target);
 }
 
+// 给线上样式一个内容地址，避免 CDN 仍返回同名旧 CSS；Windows/Linux 换行保持同一版本。
+const styleVersion = crypto.createHash('sha256')
+  .update(fs.readFileSync(path.join(root, 'styles.css'), 'utf8').replace(/\r\n/g, '\n'))
+  .digest('hex').slice(0, 12);
+for (const relative of files.filter((file) => file.endsWith('.html'))) {
+  const target = path.join(dist, relative);
+  const page = fs.readFileSync(target, 'utf8').replace(
+    /href="((?:\.\.\/|\.\/|\/)?styles\.css)"/g,
+    (_match, href) => `href="${href}?v=${styleVersion}"`
+  );
+  fs.writeFileSync(target, page);
+}
+const workerPath = path.join(dist, 'sw.js');
+const workerSource = fs.readFileSync(workerPath, 'utf8')
+  .replace("'./styles.css'", `'./styles.css?v=${styleVersion}'`)
+  .replace(/(const CACHE_NAME = `[^`]+)(`;)/, (_match, prefix, suffix) => `${prefix}-css-${styleVersion}${suffix}`);
+fs.writeFileSync(workerPath, workerSource);
+
 if (siteUrl) {
   const canonicalTargets = [
     ['index.html', '/'],
