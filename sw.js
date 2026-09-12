@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = '0.7.0';
+const APP_VERSION = '0.7.0-scroll-header';
 const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}-visual-3`;
 const APP_SHELL = [
   './',

@@ -104,6 +104,10 @@ Cloudflare Pages 推荐设置：
 npm run release:check
 ```
 
+## 页眉滚动行为更新
+
+品牌页眉位于文档顶部，随页面正常滚走，不使用 fixed/sticky 吸顶；字体、字号、标志尺寸和三类排布基准保持一致。 游戏工作区去掉固定页眉占位，桌面侧边导航独立布局；手机底部导航保持可用。
+
 ## AI 维护提醒
 
 > **⚠️ 任何修改此项目的 AI 代理（Claude Code、Cursor、Copilot 等）都必须同步更新本文件与 [AGENTS.md](./AGENTS.md)。**

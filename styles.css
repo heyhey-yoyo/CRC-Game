@@ -127,8 +127,8 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 .visual-caption { position: absolute; bottom: 1rem; right: 0; padding: 0.5rem 0.7rem; border: 1px solid var(--line); border-radius: 9px; font-size: var(--size-meta); backdrop-filter: blur(10px); }
 .landing-footer { min-height: 70px; border-top: 1px solid var(--line); font-size: var(--size-meta); }
 
-.app-shell { min-height: 100vh; }
-.topbar { position: fixed; z-index: 80; inset: 0 0 auto 0; height: var(--topbar); display: grid; grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr); align-items: center; gap: 1rem; padding: 0 1.2rem; border-bottom: 1px solid var(--line); }
+.app-shell { min-height: 100vh; display:grid; grid-template-columns:var(--nav) minmax(0,1fr); grid-template-rows:auto 1fr auto; }
+.topbar { grid-column:1/-1; position: static; z-index: 80; height: var(--topbar); display: grid; grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr); align-items: center; gap: 1rem; padding: 0 1.2rem; border-bottom: 1px solid var(--line); }
 .compact-brand .brand-mark { width: 48px; height: 48px; }
 .status-strip { display: flex; border: 1px solid var(--line); overflow: hidden; }
 .status-strip div { min-width: 120px; padding: 0.42rem 0.75rem; text-align: center; border-right: 1px solid var(--line); }
@@ -140,11 +140,11 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 .top-actions { justify-self: end; display: flex; gap: 0.45rem; }
 .icon-button { min-width: 46px; height: 44px; padding: 0 0.7rem; border: 1px solid var(--line); color: var(--muted); cursor: pointer; font-size: var(--size-meta); font-weight: 800; }
 .icon-button:hover { color: var(--text); border-color: var(--line-strong); }
-.side-nav { position: fixed; z-index: 70; top: var(--topbar); bottom: 0; left: 0; width: var(--nav); display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 0.55rem; border-right: 1px solid var(--line); backdrop-filter: blur(18px); }
+.side-nav { position: sticky; z-index: 70; top: 0; grid-column:1; grid-row:2; align-self:start; height:100dvh; width: var(--nav); display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 0.55rem; border-right: 1px solid var(--line); backdrop-filter: blur(18px); }
 .nav-button { min-height: 70px; display: grid; place-items: center; gap: 0.05rem; border: 1px solid transparent; border-radius: 13px; background: transparent; color: var(--faint); cursor: pointer; }
 .nav-button span { font-size: 1.3rem; line-height: 1; }
 .nav-button b { font-size: var(--size-meta); }
-.workspace { min-height: calc(100vh - 62px); margin-left: var(--nav); padding: calc(var(--topbar) + 2rem) 1.4rem 5.5rem; }
+.workspace { grid-column:2; grid-row:2; min-height: calc(100vh - 134px); margin-left: 0; padding: 2rem 1.4rem 5.5rem; }
 .view { width: min(100%, var(--content-max)); margin-inline: auto; display: none; }
 .view.is-active { display: block; animation: fade-in 0.22s ease; }
 @keyframes fade-in { from { opacity: 0; transform: translateY(5px); } }
@@ -279,7 +279,7 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 .region-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.75rem 1rem 1rem; border-top: 1px solid var(--line); }
 .region-buttons button { min-height: 38px; padding: 0.35rem 0.62rem; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,0.025); color: var(--muted); cursor: pointer; font-size: var(--size-meta); }
 .region-buttons button.is-selected { border-color: var(--cyan); color: var(--cyan); }
-.inspector-panel { position: sticky; top: calc(var(--topbar) + 1rem); }
+.inspector-panel { position: sticky; top: 1rem; }
 .inspector-grid { display: grid; gap: 0.55rem; }
 .inspector-grid div { padding: 0.6rem; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); }
 .inspector-grid span { display: block; }
@@ -320,7 +320,7 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 .dimension strong { margin-top: 0.12rem; font-size: 0.75rem; }
 .dimension small { margin-top: 0.15rem; color: var(--muted); font-size: var(--size-meta); }
 
-.app-footer { margin-left: var(--nav); min-height: 62px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1.4rem; border-top: 1px solid var(--line); color: var(--faint); font-size: var(--size-meta); }
+.app-footer { grid-column:2; margin-left:0; min-height: 62px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1.4rem; border-top: 1px solid var(--line); color: var(--faint); font-size: var(--size-meta); }
 .app-footer a { color: var(--muted); }
 
 .modal { width: min(94vw, 760px); max-height: 88vh; padding: 0; border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -404,9 +404,10 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
   .compact-brand small { display: none; }
   .top-actions { gap: 0.25rem; }
   .icon-button { min-width: 42px; padding: 0 0.5rem; }
-  .side-nav { top: auto; right: 0; bottom: 0; width: auto; height: 72px; flex-direction: row; padding: 0.35rem; border-right: 0; border-top: 1px solid var(--line); }
+  .app-shell { display:block; }
+  .side-nav { position:fixed; top: auto; left:0; right: 0; bottom: 0; width: auto; height: 72px; flex-direction: row; padding: 0.35rem; border-right: 0; border-top: 1px solid var(--line); }
   .nav-button { flex: 1; min-height: 60px; }
-  .workspace { margin-left: 0; padding: calc(var(--topbar) + 1rem) 0.75rem 6rem; }
+  .workspace { margin-left: 0; padding: 1rem 0.75rem 6rem; }
   .app-footer { margin-left: 0; padding-bottom: 5.2rem; flex-direction: column; align-items: flex-start; }
   .view-head { min-height: 0; flex-direction: column; }
   .view-actions { width: 100%; }
@@ -445,6 +446,7 @@ canvas:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 }
 
 @media print {
+  .app-shell { display:block; }
   .topbar { display: none !important; }
   .side-nav { display: none !important; }
   .view-actions { display: none !important; }
