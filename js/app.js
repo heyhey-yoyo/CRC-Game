@@ -144,7 +144,7 @@
     $('#contrastToggle').checked = state.ui.highContrast;
     $('#motionToggle').checked = state.ui.reducedMotion;
     $('#autosaveToggle').checked = state.ui.autosave;
-    $('#textScaleButton').textContent = state.ui.textScale === 'normal' ? 'A+' : state.ui.textScale === 'large' ? 'A++' : 'A';
+    $('#textScaleButton').textContent = state.ui.textScale === 'normal' ? 'A' : state.ui.textScale === 'large' ? 'A+' : 'A++';
   }
 
   function addEvent(type, title, text, week = currentWeek()) {
@@ -447,8 +447,8 @@
     if (!canvas || canvas.offsetParent === null) return;
     const rect = canvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(640, Math.round(rect.width * dpr));
-    canvas.height = Math.max(420, Math.round(rect.height * dpr));
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const width = rect.width;
@@ -471,10 +471,10 @@
       const x = width * 0.5 + Math.cos(angle) * radius * 1.25;
       const y = height * 0.5 + Math.sin(angle) * radius * 0.84;
       const size = 1.8 + rng() * 4.2;
-      if (layer === 'presentation') ctx.fillStyle = rng() > 0.38 ? 'rgba(99,230,213,.52)' : 'rgba(255,141,131,.30)';
-      else if (layer === 'contact') ctx.fillStyle = rng() > 0.72 ? 'rgba(131,185,255,.72)' : 'rgba(123,69,91,.35)';
+      if (layer === 'presentation') ctx.fillStyle = rng() > 0.38 ? 'rgba(229,161,137,.52)' : 'rgba(198,136,120,.30)';
+      else if (layer === 'contact') ctx.fillStyle = rng() > 0.72 ? 'rgba(159,181,202,.72)' : 'rgba(123,69,91,.35)';
       else if (layer === 'perfusion') ctx.fillStyle = `rgba(240,195,107,${0.12 + rng() * 0.48})`;
-      else ctx.fillStyle = rng() > 0.84 ? 'rgba(131,185,255,.72)' : rng() > 0.64 ? 'rgba(255,141,131,.45)' : 'rgba(99,230,213,.32)';
+      else ctx.fillStyle = rng() > 0.84 ? 'rgba(159,181,202,.72)' : rng() > 0.64 ? 'rgba(198,136,120,.45)' : 'rgba(229,161,137,.32)';
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
       ctx.fill();
@@ -764,8 +764,8 @@
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       if (canvas.width !== Math.round(rect.width * dpr) || canvas.height !== Math.round(rect.height * dpr)) {
-        canvas.width = Math.max(500, Math.round(rect.width * dpr));
-        canvas.height = Math.max(400, Math.round(rect.height * dpr));
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
       }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const width = rect.width;
@@ -783,12 +783,12 @@
         const motion = state?.ui?.reducedMotion ? 0 : time * particle.speed;
         const x = centerX + Math.cos(particle.angle + motion) * particle.radius * (width / 760);
         const y = centerY + Math.sin(particle.angle + motion) * particle.radius * 0.68 * (height / 620);
-        ctx.fillStyle = particle.type === 0 ? 'rgba(131,185,255,.78)' : particle.type < 4 ? 'rgba(255,141,131,.48)' : 'rgba(99,230,213,.44)';
+        ctx.fillStyle = particle.type === 0 ? 'rgba(159,181,202,.78)' : particle.type < 4 ? 'rgba(198,136,120,.48)' : 'rgba(229,161,137,.44)';
         ctx.beginPath();
         ctx.arc(x, y, particle.size, 0, Math.PI * 2);
         ctx.fill();
       });
-      if (!document.hidden && !$('#landing').classList.contains('is-hidden')) landingAnimation = requestAnimationFrame(draw);
+      if (!state?.ui?.reducedMotion && !document.hidden && !$('#landing').classList.contains('is-hidden')) landingAnimation = requestAnimationFrame(draw);
     };
     cancelAnimationFrame(landingAnimation);
     landingAnimation = requestAnimationFrame(draw);
@@ -811,12 +811,12 @@
     $('#saveButton').addEventListener('click', async () => { await refreshSaveList(); $('#saveDialog').showModal(); });
     $('#manualSaveButton').addEventListener('click', () => persist(true).then(refreshSaveList));
     $('#exportSaveButton').addEventListener('click', exportSave);
-    $('#importSaveInput').addEventListener('change', (event) => importSave(event.target.files?.[0]).catch((error) => toast('导入失败', error.message)));
+    $('#importSaveInput').addEventListener('change', (event) => importSave(event.target.files?.[0]).catch((error) => toast('导入失败', error.message)).finally(() => { event.target.value = ''; }));
     $('#resetCaseButton').addEventListener('click', resetCase);
 
     $('#textScaleSelect').addEventListener('change', (event) => { state.ui.textScale = event.target.value; applyUiPreferences(); requestAnimationFrame(renderMap); persist(false); });
     $('#contrastToggle').addEventListener('change', (event) => { state.ui.highContrast = event.target.checked; applyUiPreferences(); persist(false); });
-    $('#motionToggle').addEventListener('change', (event) => { state.ui.reducedMotion = event.target.checked; applyUiPreferences(); persist(false); });
+    $('#motionToggle').addEventListener('change', (event) => { state.ui.reducedMotion = event.target.checked; applyUiPreferences(); persist(false); if (!$('#landing').classList.contains('is-hidden')) startLandingAnimation(); });
     $('#autosaveToggle').addEventListener('change', (event) => { state.ui.autosave = event.target.checked; applyUiPreferences(); persist(true); });
 
     document.addEventListener('click', async (event) => {
@@ -891,7 +891,7 @@
       if (!['ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(event.key)) return;
       event.preventDefault();
       if (event.key === 'ArrowLeft') state.ui.regionIndex = (selectedRegionIndex - 1 + mapRegions.length) % mapRegions.length;
-      if (event.key === 'ArrowRight') state.ui.regionIndex = (selectedRegionIndex + 1) % mapRegions.length;
+      if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') state.ui.regionIndex = (selectedRegionIndex + 1) % mapRegions.length;
       persist(false);
       renderMap();
     });
@@ -906,6 +906,7 @@
 
     window.addEventListener('resize', () => {
       if ($('#view-ecology').classList.contains('is-active')) requestAnimationFrame(renderMap);
+      if (state?.ui?.reducedMotion && !$('#landing').classList.contains('is-hidden')) startLandingAnimation();
     });
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !$('#landing').classList.contains('is-hidden')) startLandingAnimation();
@@ -936,8 +937,16 @@
       });
     });
     $('#updateButton').addEventListener('click', () => {
-      registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
-      location.reload();
+      if (!registration.waiting) return location.reload();
+      let reloaded = false;
+      const reload = () => {
+        if (reloaded) return;
+        reloaded = true;
+        location.reload();
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', reload, { once: true });
+      window.setTimeout(reload, 4000);
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     });
   }
 

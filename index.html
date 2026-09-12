@@ -73,6 +73,10 @@
     </main>
 
     <footer class="landing-footer">
+      <nav class="landing-mobile-links" aria-label="方法与证据">
+        <a href="pages/methods.html">方法与边界</a>
+        <a href="pages/references.html">证据来源</a>
+      </nav>
       <span id="contentBaseline">医学内容基线：载入中</span>
       <span>本地优先 · 无广告 · 无跟踪器</span>
     </footer>
@@ -91,7 +95,7 @@
       </div>
       <div class="top-actions">
         <button class="icon-button" id="installButton" type="button" hidden>安装</button>
-        <button class="icon-button" id="textScaleButton" type="button" aria-label="调整字号">A+</button>
+        <button class="icon-button" id="textScaleButton" type="button" aria-label="调整字号">A</button>
         <button class="icon-button" id="settingsButton" type="button" aria-label="打开设置">设置</button>
         <button class="icon-button" id="saveButton" type="button" aria-label="打开存档管理">存档</button>
       </div>
@@ -164,7 +168,7 @@
         <div class="ecology-layout">
           <article class="panel map-panel">
             <header class="panel-head"><div><span class="panel-index">M</span><h3>空间图层</h3></div><div class="layer-tabs"><button class="is-active" data-layer="cells">细胞</button><button data-layer="presentation">MHC-I</button><button data-layer="contact">CD8 接触</button><button data-layer="perfusion">灌注</button></div></header>
-            <canvas id="ecologyCanvas" width="960" height="600" tabindex="0" aria-label="抽象肿瘤生态地图。使用左右方向键切换代表区域，按回车查看。"></canvas>
+            <canvas id="ecologyCanvas" width="960" height="600" tabindex="0" aria-label="抽象肿瘤生态地图。使用左右方向键或回车键切换代表区域查看。"></canvas>
             <div class="region-buttons" id="regionButtons" aria-label="代表区域快捷选择"></div>
           </article>
           <aside class="panel inspector-panel">

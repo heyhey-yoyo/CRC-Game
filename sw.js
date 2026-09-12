@@ -70,6 +70,6 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       });
-    })
+    }).catch(async () => (await caches.match(request)) || Response.error())
   );
 });
