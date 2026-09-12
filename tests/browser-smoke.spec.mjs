@@ -11,6 +11,71 @@ async function openStandalone(page) {
   await page.locator("#landing:not(.is-hidden)").waitFor();
 }
 
+async function openUpdateScenario(page) {
+  await page.addInitScript(() => {
+    const waiting = new EventTarget();
+    waiting.state = 'installed';
+    const registration = new EventTarget();
+    registration.waiting = waiting;
+    registration.update = async () => registration;
+    const serviceWorker = new EventTarget();
+    serviceWorker.controller = { version: 'old' };
+    serviceWorker.register = async () => registration;
+    const scenario = { serviceWorker, waiting, registration, sent: [], failMessage: false };
+    waiting.postMessage = message => {
+      if (scenario.failMessage) throw new Error('模拟更新通信失败');
+      scenario.sent.push(message);
+    };
+    Object.defineProperty(navigator, 'serviceWorker', { value: serviceWorker, configurable: true });
+    window.updateScenario = scenario;
+  });
+  await page.route('https://update-check.test/**', route => route.fulfill({
+    contentType: 'text/html', body: readFileSync(standalone, 'utf8'),
+  }));
+  await page.goto('https://update-check.test/');
+  await page.locator('#landing:not(.is-hidden)').waitFor();
+  await expect(page.locator('#updateButton')).toBeVisible();
+}
+
+test('slow Service Worker activation never reloads early and reloads once after takeover', async ({ page }) => {
+  let navigations = 0;
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navigations += 1; });
+  await page.clock.install();
+  await openUpdateScenario(page);
+  await page.locator('#updateButton').click();
+  await page.clock.fastForward(10_000);
+  expect(navigations).toBe(1);
+  await expect(page.locator('#updateButton')).toHaveText('等待新版接管…');
+  expect(await page.evaluate(() => window.updateScenario.sent)).toEqual([{ type: 'SKIP_WAITING' }]);
+  await page.evaluate(() => {
+    const { serviceWorker, waiting } = window.updateScenario;
+    serviceWorker.controller = waiting;
+    serviceWorker.dispatchEvent(new Event('controllerchange'));
+    serviceWorker.dispatchEvent(new Event('controllerchange'));
+  });
+  await expect.poll(() => navigations).toBe(2);
+});
+
+test('failed update preserves the page and permits a new attempt', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await openUpdateScenario(page);
+  await page.evaluate(() => { window.updateScenario.failMessage = true; });
+  await page.locator('#updateButton').click();
+  await expect(page.locator('#updateButton')).toBeEnabled();
+  await expect(page.locator('body')).toContainText('当前页面已保留，可稍后重试。');
+  await page.evaluate(() => { window.updateScenario.failMessage = false; });
+  await page.locator('#updateButton').click();
+  await expect(page.locator('#updateButton')).toBeDisabled();
+  await page.evaluate(() => {
+    const { waiting } = window.updateScenario;
+    waiting.state = 'redundant';
+    waiting.dispatchEvent(new Event('statechange'));
+  });
+  await expect(page.locator('#updateButton')).toBeEnabled();
+  expect(errors).toEqual([]);
+});
+
 test("standalone demo completes the teaching flow without layout or page errors", async ({ browser }) => {
   const errors = [];
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
@@ -82,4 +147,39 @@ test("standalone demo completes the teaching flow without layout or page errors"
   await mobileContext.close();
   await context.close();
   expect(errors).toEqual([]);
+});
+
+
+test('UI save survives a fresh document and the same file imports twice', async ({ page }) => {
+  await page.route('https://storage-check.test/**', route => route.fulfill({
+    contentType: 'text/html', body: readFileSync(standalone, 'utf8'),
+  }));
+  await page.goto('https://storage-check.test/');
+  await page.locator('#newCaseButton').click();
+  await page.locator('#advanceButton').click();
+  await page.locator('#eventDialog .button.primary').click();
+  await page.locator('#saveButton').click();
+  await page.locator('#manualSaveButton').click();
+  await expect(page.locator('#saveList [data-load-slot]')).toHaveCount(1);
+  const pending = page.waitForEvent('download');
+  await page.locator('#exportSaveButton').click();
+  const download = await pending;
+  expect(await download.failure()).toBeNull();
+  const savedText = readFileSync(await download.path(), 'utf8');
+  const envelope = JSON.parse(savedText);
+  expect(envelope.checksum).toBeTruthy();
+  await page.reload();
+  await expect(page.locator('#continueCaseButton')).toBeVisible();
+  await page.locator('#continueCaseButton').click();
+  await page.locator('#saveButton').click();
+  const record = await page.evaluate(async () => (await window.CRC_STORAGE.list())[0]);
+  expect(record.payload.run).toEqual(envelope.payload.run);
+  expect(record.payload.hypotheses).toEqual(envelope.payload.hypotheses);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.locator('#importSaveInput').setInputFiles({ name: 'roundtrip.json', mimeType: 'application/json', buffer: Buffer.from(savedText) });
+    await expect(page.locator('#importSaveInput')).toHaveValue('');
+    await expect(page.locator('body')).toContainText('存档已导入');
+    const imported = await page.evaluate(async () => (await window.CRC_STORAGE.list())[0]);
+    expect(imported.payload.run).toEqual(envelope.payload.run);
+  }
 });

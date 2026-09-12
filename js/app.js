@@ -705,7 +705,7 @@
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   async function exportSave() {
@@ -936,17 +936,70 @@
         if (installing.state === 'installed' && navigator.serviceWorker.controller) $('#updateBanner').classList.remove('is-hidden');
       });
     });
-    $('#updateButton').addEventListener('click', () => {
-      if (!registration.waiting) return location.reload();
-      let reloaded = false;
-      const reload = () => {
-        if (reloaded) return;
-        reloaded = true;
-        location.reload();
-      };
-      navigator.serviceWorker.addEventListener('controllerchange', reload, { once: true });
-      window.setTimeout(reload, 4000);
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    if (registration.waiting) $('#updateBanner').classList.remove('is-hidden');
+    const updateButton = $('#updateButton');
+    let updateRequested = false;
+    updateButton.addEventListener('click', async () => {
+      if (updateRequested) return;
+      updateRequested = true;
+      updateButton.disabled = true;
+      const originalText = updateButton.textContent;
+      updateButton.textContent = '正在准备更新…';
+      try {
+        if (!registration.waiting) await registration.update();
+        const waiting = registration.waiting;
+        if (!waiting) {
+          updateRequested = false;
+          updateButton.disabled = false;
+          updateButton.textContent = originalText;
+          toast('更新准备中', '新版尚未准备好，请稍后再试。');
+          return;
+        }
+        const previousController = navigator.serviceWorker.controller;
+        let settled = false;
+        let timer;
+        const cleanup = () => {
+          window.clearTimeout(timer);
+          navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+          waiting.removeEventListener('statechange', onStateChange);
+        };
+        const fail = () => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          updateRequested = false;
+          updateButton.disabled = false;
+          updateButton.textContent = originalText;
+          toast('更新未完成', '当前页面已保留，可稍后重试。');
+        };
+        const onControllerChange = () => {
+          if (settled || !navigator.serviceWorker.controller || navigator.serviceWorker.controller === previousController) return;
+          settled = true;
+          cleanup();
+          location.reload();
+        };
+        const onStateChange = () => {
+          if (waiting.state === 'redundant') fail();
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+        waiting.addEventListener('statechange', onStateChange);
+        // 超时仅提示，绝不在新版接管前刷新；慢速设备仍等待 controllerchange。
+        timer = window.setTimeout(() => {
+          updateButton.textContent = '等待新版接管…';
+          toast('更新准备中', '更新仍在准备中，完成后将自动刷新。');
+        }, 8000);
+        try {
+          waiting.postMessage({ type: 'SKIP_WAITING' });
+          onControllerChange();
+        } catch {
+          fail();
+        }
+      } catch {
+        updateRequested = false;
+        updateButton.disabled = false;
+        updateButton.textContent = originalText;
+        toast('检查更新失败', '暂时无法检查更新，请稍后重试。');
+      }
     });
   }
 

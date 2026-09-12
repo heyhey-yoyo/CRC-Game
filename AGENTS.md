@@ -15,7 +15,7 @@
 - 原生 HTML/CSS/JS，零运行时依赖，无框架、无打包器
 - Web Worker 模拟：`js/sim-worker.js` 经 `importScripts` 加载引擎，消息协议 `INIT / ADVANCE / SIMULATE_COMPLETE`（12s 超时，失败自动降级主线程直调）
 - 持久化三级降级：IndexedDB → localStorage → 内存（`js/storage.js`，schema 2，FNV-1a 32 位 checksum）
-- PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0-visual-2`（`CACHE_NAME` 由 `APP_VERSION` 拼接 `-visual-N` 后缀；导航 network-first、静态 cache-first）+ manifest + 更新横幅
+- PWA：`sw.js` 版本化缓存 `crc-immune-frontier-0.7.0-visual-3`（`CACHE_NAME` 由 `APP_VERSION` 拼接 `-visual-N` 后缀；导航 network-first、静态 cache-first）+ manifest + 更新横幅
 - 测试：Node 内置 `node --test` + 项目内 Node Playwright Chromium smoke test
 
 ## 项目结构
@@ -112,6 +112,25 @@ npm run release:check    # 全部串联：check → validate:content → test �
 ## 2026-09-13 维护补充
 
 页面以单一浅色根变量定义主题，移动端不能仅靠隐藏横向溢出来通过验收；粒子仅改外观，不改模拟状态。
+
+## 问题闭环维护
+
+更新按钮先监听 controllerchange，再发 SKIP_WAITING；8 秒定时器仅提示，不得强制刷新。通信失败或 waiting worker 进入 redundant 时解除忙碌状态。浏览器用例覆盖慢速接管、一次性刷新和失败重试；缓存标识同步提升。
+
+
+## 跨项目视觉与回归基准（2026-09-13）
+
+本项目归类为 **普通项目**。72px / 64px 页眉，48px / 40px 方章，18px / 16px 衬线标题，12px 无衬线副标题。 正文采用统一系统无衬线字体、默认 16px / 1.6；标题使用衬线层级，数字与代码可使用统一等宽族。辅助文字通常为 12–14px，密集科学数据可按实际场景调整。主界面延续米白与赤陶 #a94f31，柔和色块上的文字用更深色保证可读性。
+
+更新按钮仅在新版 Service Worker 实际接管后刷新；超过 8 秒只提示等待，通信失败可重试。证据卡与辅助文字提高对比度，方法页和游戏页共用品牌页眉。导出链接延迟回收；新增真实界面存档重载、同文件二次导入及更新竞态浏览器测试。
+
+当前检查命令：
+
+```bash
+npm run release:check
+```
+
+本节为当前视觉维护基准，替代此前分散的字号、页眉尺寸和 QA 颜色例外；不要重新添加全局深色主题与末尾浅色覆盖。保留一个顶层 `:root`，条件规则和深色图形舞台局部令牌保持独立。修改后至少核验 1440、820、390px，涉及断点、图表或存储时补查相应交互。构建、单测、浏览器本地和线上部署是不同验收层次，记录其实际范围。
 
 ## AI 维护提醒
 

@@ -18,7 +18,7 @@ test('production files and public documentation exist', () => {
 
 test('desktop reading order is row-major and defaults to readable typography', () => {
   const css = read('styles.css');
-  assert.match(css, /font-size:\s*clamp\(18px,[^;]+19px\)/);
+  assert.match(css, /:root\s*\{[^}]*font-size:\s*16px/s);
   assert.match(css, /grid-template-areas:\s*"case hypothesis"\s*"pathway evidence"\s*"prediction events"/s);
   assert.match(css, /@media \(max-width: 1250px\)[\s\S]*grid-template-areas:\s*"case" "hypothesis" "pathway" "evidence" "prediction" "events"/);
 });
