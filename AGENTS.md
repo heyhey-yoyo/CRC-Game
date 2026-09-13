@@ -101,7 +101,7 @@ npm run release:check
 
 正文采用统一系统无衬线字体，默认 16px / 1.6；标题采用 Georgia、Times New Roman、Songti SC、STSong 衬线族。数字与代码可使用 SFMono-Regular、Consolas、Liberation Mono、Microsoft YaHei 等宽族。按钮和输入通常 15px，辅助文字 12–14px，密集科学数据允许有理由的局部调整。页面底色 #f3eee5、正文 #24221f、赤陶强调 #a94f31，柔和底色上的强调文字 #823a25；科学分类色、热图、作品主题与状态色保留必要区分度。
 
-主样式保留一个顶层 `:root`，条件规则和深色画布局部令牌独立维护，避免叠加重复主题或末尾覆盖层。修改视觉后核对实际渲染字体、字号、间距、对比度和操作可达性；至少检查 1440、820、390px，涉及断点时补查两侧宽度，涉及画布或存储时补查交互。构建、单测、本地浏览器和线上部署分别记录；发布后禁用缓存/硬刷新，并核对实际资源版本。
+主样式保留一个顶层 `:root`，条件规则和深色画布局部令牌独立维护，避免叠加重复主题或末尾覆盖层。修改视觉后核对实际渲染字体、字号、间距、对比度和操作可达性；至少检查 1440、820、390px，涉及断点时补查两侧宽度，涉及画布或存储时补查交互。构建、单测、本地浏览器和线上部署分别记录；发布后禁用缓存/硬刷新，并核对实际资源版本；还必须保留旧 Service Worker 与站点缓存，验证普通刷新或应用更新提示的实际升级流程，不能用清空缓存代替。
 
 页眉外层保持 width:100%、max-width:none，水平内边距为 max(16px,calc((100% - 1280px)/2 + 16px))；按包含块宽度计算，避免 100vw 将滚动条计入而产生溢出。手机以 16px 留白，保持标题及操作可达。
 
@@ -115,7 +115,7 @@ npm run release:check
 
 ## 部署
 
-发布缓存修订必须贯穿 HTML 脚本、深层模块引用、Worker/importScripts 与 SW 预缓存；游戏还包括 JSON 内容请求。固定地址资源返回 no-cache，SW 安装以 Request.cache=reload 获取资源。资源缓存修订独立于应用/模型/schema，不改科学算法；缓存回归检查整条依赖链，不能只检查入口查询参数。
+发布缓存修订必须贯穿 HTML 脚本、深层模块引用、Worker/importScripts 与 SW 预缓存；游戏还包括 JSON 内容请求。_headers 请求使用 no-cache；托管平台可能覆盖响应缓存期限，发布仍须同步整条依赖链的资源地址并核对线上字节。SW 安装以 Request.cache=reload 获取资源。资源缓存修订独立于应用/模型/schema，不改科学算法；缓存回归检查整条依赖链，不能只检查入口查询参数。
 
 - Cloudflare Pages Git 集成：Production branch `main`，Build command `npm run build`，输出目录 `dist`，环境变量 `SITE_URL=https://正式域名`
 - **无 GitHub Actions**：本项目不使用 CI，不要新增 `.github/workflows/`
