@@ -183,7 +183,7 @@
         const blob = new Blob([window.__CRC_EMBEDDED_WORKER__], { type: 'text/javascript' });
         worker = new Worker(URL.createObjectURL(blob));
       } else {
-        worker = new Worker('./js/sim-worker.js?v=0.7.1-upgrade-2');
+        worker = new Worker('./js/sim-worker.js?v=0.7.1-upgrade-3');
       }
       worker.addEventListener('message', (event) => {
         const message = event.data || {};
@@ -281,14 +281,18 @@
     updateControlLocking();
   }
 
+  function renderContentMetadata() {
+    $('#footerVersion').textContent = `内容 ${content.manifest.contentVersion} · 医学基线 ${content.manifest.medicalBaseline}`;
+    $('#contentBaseline').textContent = `医学内容基线：${content.manifest.medicalBaseline}`;
+  }
+
   function renderHeader() {
     const week = currentWeek();
     $('#weekMetric').textContent = `W${week}`;
     $('#pathMetric').textContent = state.phase === 'planning' ? '未提交' : currentPathway().shortName;
     $('#caseEyebrow').textContent = `${content.caseData.title} · ${content.caseData.durationMinutes} 分钟`;
     $('#caseSubtitle').textContent = content.caseData.subtitle;
-    $('#footerVersion').textContent = `内容 ${content.manifest.contentVersion} · 医学基线 ${content.manifest.medicalBaseline}`;
-    $('#contentBaseline').textContent = `医学内容基线：${content.manifest.medicalBaseline}`;
+    renderContentMetadata();
     const next = MILESTONES.find((item) => item > week);
     if (state.phase === 'planning') $('#advanceButton').textContent = '提交计划并推进到 W2';
     else if (state.phase === 'completed') $('#advanceButton').textContent = '病例已完成';
@@ -1007,6 +1011,7 @@
     try {
       setBootMessage('载入版本化内容包……');
       content = await window.CRC_CONTENT_LOADER.load();
+      renderContentMetadata();
       setBootMessage('检查本地存档与迁移……');
       const saved = await window.CRC_STORAGE.load(AUTO_SLOT);
       state = sanitizeState(saved?.payload || defaultState());

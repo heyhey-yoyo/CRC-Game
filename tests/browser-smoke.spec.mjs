@@ -9,6 +9,8 @@ const standalone = resolve(root, "dist", "standalone-demo.html");
 async function openStandalone(page) {
   await page.setContent(readFileSync(standalone, "utf8"), { waitUntil: "load" });
   await page.locator("#landing:not(.is-hidden)").waitFor();
+  const manifest = JSON.parse(readFileSync(resolve(root, "data/content-manifest.json"), "utf8"));
+  await expect(page.locator("#contentBaseline")).toHaveText(`医学内容基线：${manifest.medicalBaseline}`);
 }
 
 async function openUpdateScenario(page) {

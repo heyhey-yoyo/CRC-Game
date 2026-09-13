@@ -1,5 +1,5 @@
 'use strict';
-importScripts('./sim-engine.js?v=0.7.1-upgrade-2');
+importScripts('./sim-engine.js?v=0.7.1-upgrade-3');
 
 self.addEventListener('message', (event) => {
   const message = event.data || {};

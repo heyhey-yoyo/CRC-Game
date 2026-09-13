@@ -1,21 +1,21 @@
 'use strict';
 
 const APP_VERSION = '0.7.1';
-const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}-upgrade-2`;
+const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}-upgrade-3`;
 const APP_SHELL = [
   './',
   './index.html',
   './404.html',
   './styles.css',
-  './js/content-loader.js?v=0.7.1-upgrade-2',
-  './js/sim-engine.js?v=0.7.1-upgrade-2',
-  './js/sim-worker.js?v=0.7.1-upgrade-2',
-  './js/storage.js?v=0.7.1-upgrade-2',
-  './js/app.js?v=0.7.1-upgrade-2',
-  './data/content-manifest.json?v=0.7.1-upgrade-2',
-  './data/pathways.json?v=0.7.1-upgrade-2',
-  './data/evidence.json?v=0.7.1-upgrade-2',
-  './data/cases/case-b2m-escape.json?v=0.7.1-upgrade-2',
+  './js/content-loader.js?v=0.7.1-upgrade-3',
+  './js/sim-engine.js?v=0.7.1-upgrade-3',
+  './js/sim-worker.js?v=0.7.1-upgrade-3',
+  './js/storage.js?v=0.7.1-upgrade-3',
+  './js/app.js?v=0.7.1-upgrade-3',
+  './data/content-manifest.json?v=0.7.1-upgrade-3',
+  './data/pathways.json?v=0.7.1-upgrade-3',
+  './data/evidence.json?v=0.7.1-upgrade-3',
+  './data/cases/case-b2m-escape.json?v=0.7.1-upgrade-3',
   './manifest.webmanifest',
   './icons/project-mark.svg',
   './icons/icon-192.png',
