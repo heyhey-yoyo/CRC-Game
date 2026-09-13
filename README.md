@@ -81,6 +81,12 @@ Cloudflare Pages 推荐设置：
 - 原创内容与机制文档：CC BY 4.0，见 `CONTENT-LICENSE.md`
 - 外部资料仍受其原始许可和版权约束
 
+---
+
+> AI 编程代理请阅读 [AGENTS.md](./AGENTS.md) 了解代码架构、测试与开发约定。
+
+---
+
 ## AI 维护提醒
 
 > **⚠️ 任何修改此项目的 AI 代理（Claude Code、Cursor、Copilot 等）都必须同步更新本文件与 [AGENTS.md](./AGENTS.md)。**

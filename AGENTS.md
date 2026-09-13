@@ -72,7 +72,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `content.test.mjs`：内容包校验 + 三字段分离；`storage.test.mjs`：checksum 稳定性、schema 迁移、篡改检测
 - `static.test.mjs`：必需文件、CSS 排印/网格、安全头 token、SW 行为；`link.test.mjs`：本地链接完整性
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
-- `browser-smoke.py` 与 `requirements-dev.txt`：保留的历史兼容参考；默认脚本、发布门禁和 Cloudflare 构建**不得**重新依赖 Python 测试环境。
+- `browser-smoke.py` 与 `requirements-dev.txt`：Python 冒烟脚本及其依赖；默认脚本、发布门禁和 Cloudflare 构建**不得**依赖 Python 测试环境。
 
 发布检查：
 
@@ -88,7 +88,7 @@ npm run release:check
 - 确定性：`mulberry32(seed)`，隐藏性状由 `deriveHiddenTraits(seed)` 派生；`advanceRun` 拒绝倒退；**任何改变结果/迁移/校验的行为必须加固定种子回归测试**
 - 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
 - UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
-- **版本一致性**：`0.7.0` 出现在 `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）——发布新版本需同步更新
+- **版本一致性**：应用版本常量需在下列位置保持一致，发布新版本时同步更新： `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）
 
 ### 品牌与排版
 
@@ -114,7 +114,7 @@ npm run release:check
 
 - Cloudflare Pages Git 集成：Production branch `main`，Build command `npm run build`，输出目录 `dist`，环境变量 `SITE_URL=https://正式域名`
 - **无 GitHub Actions**：本项目不使用 CI，不要新增 `.github/workflows/`
-- 回滚三种方式见 `docs/ROLLBACK.md`（Dashboard 回滚 / git revert / 直接上传）；内容包可单独回滚
+- 回滚方式见 `docs/ROLLBACK.md`（Dashboard 回滚 / git revert）；内容包可单独回滚
 - 上线前过 `docs/RELEASE_CHECKLIST.md`；版本 tag 与 GitHub Release 对齐
 
 ## 安全与数据注意事项
@@ -123,11 +123,13 @@ npm run release:check
 - 导入存档视为不可信输入：先 `verifyEnvelope`（JSON + schema + checksum）再 `sanitizeState` 白名单清洗
 - 所有动态文字经 `escapeHtml()` 转义；CSP 仅允许同源脚本/Worker
 - 无后端、无账号、无第三方追踪；存档只存本机浏览器，只有用户主动导出才产生文件
-- **无真实患者数据**：SECURITY.md 与 MEDICAL_BOUNDARIES.md 明令禁止存档/报告中出现真实临床信息（注意 SECURITY.md 的 "1.x" 表述已过时，当前 0.7.0）
+- **无真实患者数据**：SECURITY.md 与 MEDICAL_BOUNDARIES.md 明令禁止存档/报告中出现真实临床信息；SECURITY.md 中的版本表述以 GitHub Release 为准，不随本文件维护
 
 ## 标志维护约定
 
 项目标志采用统一的深灰方章、米白线条与赤陶色识别点，页面标志与 favicon 共用同一 `icons/project-mark.svg`。后续替换必须保持原标志容器宽高，不得借机改变页眉、网格或页面布局。
+
+---
 
 ## AI 维护提醒
 
