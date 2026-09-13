@@ -1,21 +1,21 @@
 'use strict';
 
 const APP_VERSION = '0.7.1';
-const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}-semantic-1`;
+const CACHE_NAME = `crc-immune-frontier-${APP_VERSION}-upgrade-2`;
 const APP_SHELL = [
   './',
   './index.html',
   './404.html',
   './styles.css',
-  './js/content-loader.js',
-  './js/sim-engine.js',
-  './js/sim-worker.js',
-  './js/storage.js',
-  './js/app.js',
-  './data/content-manifest.json',
-  './data/pathways.json',
-  './data/evidence.json',
-  './data/cases/case-b2m-escape.json',
+  './js/content-loader.js?v=0.7.1-upgrade-2',
+  './js/sim-engine.js?v=0.7.1-upgrade-2',
+  './js/sim-worker.js?v=0.7.1-upgrade-2',
+  './js/storage.js?v=0.7.1-upgrade-2',
+  './js/app.js?v=0.7.1-upgrade-2',
+  './data/content-manifest.json?v=0.7.1-upgrade-2',
+  './data/pathways.json?v=0.7.1-upgrade-2',
+  './data/evidence.json?v=0.7.1-upgrade-2',
+  './data/cases/case-b2m-escape.json?v=0.7.1-upgrade-2',
   './manifest.webmanifest',
   './icons/project-mark.svg',
   './icons/icon-192.png',
@@ -28,7 +28,7 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL.map(url => new Request(url, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (event) => {

@@ -91,7 +91,7 @@ function makeStandalone() {
     evidence: JSON.parse(fs.readFileSync(path.join(root, 'data/evidence.json'), 'utf8'))
   };
   const engine = fs.readFileSync(path.join(root, 'js/sim-engine.js'), 'utf8');
-  const worker = fs.readFileSync(path.join(root, 'js/sim-worker.js'), 'utf8').replace(/importScripts\('\.\/sim-engine\.js'\);?/, '');
+  const worker = fs.readFileSync(path.join(root, 'js/sim-worker.js'), 'utf8').replace(/importScripts\('\.\/sim-engine\.js(?:\?[^']*)?'\);?/, '');
   const embeddedWorker = `${engine}\n${worker}`;
   const scripts = ['js/content-loader.js', 'js/sim-engine.js', 'js/storage.js', 'js/app.js'].map((file) => fs.readFileSync(path.join(root, file), 'utf8'));
 
@@ -100,7 +100,7 @@ function makeStandalone() {
     .replace(/\s*<link rel="icon"[^>]+>/, '')
     .replace(/\s*<link rel="apple-touch-icon"[^>]+>/, '')
     .replace('<link rel="stylesheet" href="styles.css">', `<style>\n${css}\n</style>`)
-    .replace(/\s*<script src="js\/content-loader\.js" defer><\/script>\s*<script src="js\/sim-engine\.js" defer><\/script>\s*<script src="js\/storage\.js" defer><\/script>\s*<script src="js\/app\.js" defer><\/script>/, () => `\n<script>window.__CRC_EMBEDDED_CONTENT__=${JSON.stringify(content)};window.__CRC_EMBEDDED_WORKER__=${JSON.stringify(embeddedWorker)};<\/script>\n${scripts.map((script) => `<script>\n${script}\n<\/script>`).join('\n')}`)
+    .replace(/\s*<script src="js\/content-loader\.js(?:\?[^"]*)?" defer><\/script>\s*<script src="js\/sim-engine\.js(?:\?[^"]*)?" defer><\/script>\s*<script src="js\/storage\.js(?:\?[^"]*)?" defer><\/script>\s*<script src="js\/app\.js(?:\?[^"]*)?" defer><\/script>/, () => `\n<script>window.__CRC_EMBEDDED_CONTENT__=${JSON.stringify(content)};window.__CRC_EMBEDDED_WORKER__=${JSON.stringify(embeddedWorker)};<\/script>\n${scripts.map((script) => `<script>\n${script}\n<\/script>`).join('\n')}`)
     .replace(/href="pages\/[^\"]+"/g, 'href="#" title="完整项目中提供该说明页面"')
     .replace(/href="icons\/[^\"]+"/g, 'href="#"')
     .replace(/content="\/icons\/icon-512\.png"/g, 'content=""');

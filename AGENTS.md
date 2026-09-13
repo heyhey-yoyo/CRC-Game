@@ -115,6 +115,8 @@ npm run release:check
 
 ## 部署
 
+发布缓存修订必须贯穿 HTML 脚本、深层模块引用、Worker/importScripts 与 SW 预缓存；游戏还包括 JSON 内容请求。固定地址资源返回 no-cache，SW 安装以 Request.cache=reload 获取资源。资源缓存修订独立于应用/模型/schema，不改科学算法；缓存回归检查整条依赖链，不能只检查入口查询参数。
+
 - Cloudflare Pages Git 集成：Production branch `main`，Build command `npm run build`，输出目录 `dist`，环境变量 `SITE_URL=https://正式域名`
 - **无 GitHub Actions**：本项目不使用 CI，不要新增 `.github/workflows/`
 - 回滚方式见 `docs/ROLLBACK.md`（Dashboard 回滚 / git revert）；内容包可单独回滚

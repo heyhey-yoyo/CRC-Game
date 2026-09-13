@@ -183,7 +183,7 @@
         const blob = new Blob([window.__CRC_EMBEDDED_WORKER__], { type: 'text/javascript' });
         worker = new Worker(URL.createObjectURL(blob));
       } else {
-        worker = new Worker('./js/sim-worker.js');
+        worker = new Worker('./js/sim-worker.js?v=0.7.1-upgrade-2');
       }
       worker.addEventListener('message', (event) => {
         const message = event.data || {};

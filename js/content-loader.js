@@ -4,7 +4,7 @@
   const REQUIRED_PATHWAY_IDS = ['pembro', 'nivoipi', 'folfoxbev'];
 
   async function fetchJson(url) {
-    const response = await fetch(url, { cache: 'no-cache', credentials: 'same-origin' });
+    const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}v=0.7.1-upgrade-2`, { cache: 'no-cache', credentials: 'same-origin' });
     if (!response.ok) throw new Error(`Content request failed: ${response.status} ${url}`);
     return response.json();
   }
