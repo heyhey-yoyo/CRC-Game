@@ -19,7 +19,7 @@
     {"id": "selection", "name": "治疗选择正在改变克隆构成", "summary": "优势克隆下降时，低频逃逸克隆的相对比例可能上升。", "evidenceTier": "生态模型 / 需纵向证据"}
   ],
   "tests": [
-    {"id": "ctdna", "name": "ctDNA 研究性趋势", "collectWeek": 0, "returnWeek": 2, "classification": "research", "limitations": ["低释放可导致假阴性", "不能单独决定换药", "只输出检出状态、趋势与置信度"]},
+    {"id": "ctdna", "name": "ctDNA 研究性检测", "collectWeek": 0, "returnWeek": 2, "classification": "research", "limitations": ["低释放可导致假阴性", "不能单独决定换药", "W2 单次输出检出状态与置信度，不提供纵向趋势"]},
     {"id": "b2m", "name": "B2M / MHC-I 组织面板", "collectWeek": 0, "returnWeek": 2, "classification": "translational", "limitations": ["仅代表取样区域", "基因、蛋白与表面表达可能不一致", "不是常规实时监测标准"]},
     {"id": "imaging", "name": "分类影像评估", "collectWeek": 8, "returnWeek": 8, "classification": "clinical", "limitations": ["游戏不模拟 RECIST 尺寸测量", "免疫路径的疑似进展不自动等于确认进展"]}
   ],

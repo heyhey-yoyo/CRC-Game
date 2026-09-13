@@ -65,3 +65,27 @@ test('same-seed pathways produce interpretable trade-offs rather than a universa
   assert.notDeepEqual(outcomes.pembro.internal, outcomes.folfoxbev.internal);
   assert.ok(outcomes.nivoipi.iraeEvent || outcomes.nivoipi.sustainability !== '可持续');
 });
+
+test('cognitive hypotheses never alter biology for any treatment pathway', () => {
+  for (const pathway of pathways.pathways) {
+    for (const seed of [2101, 2130, 1042]) {
+      const run = (hypotheses) => engine.simulateComplete({ caseData, pathways, pathwayId: pathway.id, seed, hypotheses, selectedTests: ['ctdna', 'b2m'], predictions: [] }, pathways);
+      const original = run(['presentation']);
+      for (const hypotheses of [[], ['exhaustion'], ['presentation', 'exhaustion', 'selection']]) {
+        const changed = run(hypotheses);
+        assert.deepEqual(changed.snapshots, original.snapshots);
+        assert.deepEqual(changed.state, original.state);
+        assert.deepEqual(changed.outcome, original.outcome);
+        assert.equal(changed.modelVersion, engine.MODEL_VERSION);
+      }
+    }
+  }
+});
+
+test('old progressed model records remain intact and cannot silently mix model rules', () => {
+  const saved = complete('pembro');
+  delete saved.modelVersion;
+  const before = JSON.stringify(saved);
+  assert.throws(() => engine.advanceRun(saved, pathways, 8), /重新开始/);
+  assert.equal(JSON.stringify(saved), before);
+});

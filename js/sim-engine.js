@@ -1,7 +1,8 @@
 (function initSimulationEngine(scope) {
   'use strict';
 
-  const ENGINE_VERSION = '0.7.0';
+  const ENGINE_VERSION = '0.7.1';
+  const MODEL_VERSION = '1.0.0';
   const TICKS_PER_DAY = 4;
   const DAYS_PER_WEEK = 7;
   const MILESTONES = Object.freeze([0, 2, 4, 6, 8]);
@@ -55,6 +56,7 @@
     const sensitiveBaseline = 1 - escapeBaseline;
     return {
       engineVersion: ENGINE_VERSION,
+      modelVersion: MODEL_VERSION,
       caseId: caseData.id,
       pathwayId: pathway.id,
       seed: resolvedSeed,
@@ -136,7 +138,7 @@
         ? (run.traits.mhcRetained ? 0.42 : 0.16)
         : 0.68;
     const contact = clamp(s.contactEfficiency * (0.82 + s.perfusion * 0.38), 0.18, 0.92);
-    const exhaustionRecovery = s.immuneExposure * (0.0048 + (run.plan.hypotheses.includes('exhaustion') ? 0.0008 : 0));
+    const exhaustionRecovery = s.immuneExposure * 0.0048;
     s.reversibleExhaustion = clamp(s.reversibleExhaustion - exhaustionRecovery + 0.0012, 0.12, 0.88);
     const immuneFunction = clamp(s.immuneActivity * (1 - s.reversibleExhaustion * 0.58) * (run.traits.ifnSignalLoss ? 0.58 : 1), 0.05, 0.92);
 
@@ -322,6 +324,8 @@
 
   function advanceRun(runInput, pathways, targetWeek) {
     const run = copy(runInput);
+    if (run.currentTick > 0 && run.modelVersion !== MODEL_VERSION) throw new Error('此存档由不同或未标记的模型生成，可保留查看和导出；继续模拟请重新开始，避免混合模型结果。');
+    run.modelVersion = MODEL_VERSION;
     const pathway = pathwayById(pathways, run.pathwayId);
     if (!pathway) throw new Error('Pathway not found.');
     const normalizedTarget = MILESTONES.includes(Number(targetWeek)) ? Number(targetWeek) : 8;
@@ -367,6 +371,7 @@
 
   const api = Object.freeze({
     ENGINE_VERSION,
+    MODEL_VERSION,
     TICKS_PER_DAY,
     DAYS_PER_WEEK,
     MILESTONES,

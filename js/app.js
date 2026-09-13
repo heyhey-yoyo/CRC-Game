@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = '0.7.0';
+  const APP_VERSION = '0.7.1';
   const AUTO_SLOT = 'autosave';
   const MILESTONES = [0, 2, 4, 6, 8];
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -397,8 +397,8 @@
         refs: ['b2m-msih-crc']
       },
       {
-        code: 'D', title: 'ctDNA 动态', subtitle: '研究信号，不是即时雷达',
-        rows: [['可用信息', '输出检出 / 未检出、趋势和置信度。'], ['限制', '低释放、低频克隆和技术灵敏度可造成假阴性。'], ['游戏实现', '研究结果不会自动触发换药。']],
+        code: 'D', title: 'ctDNA 研究性检测', subtitle: '研究信号，不是即时雷达',
+        rows: [['可用信息', 'W2 单次输出检出 / 未检出和置信度，不提供纵向趋势。'], ['限制', '低释放、低频克隆和技术灵敏度可造成假阴性。'], ['游戏实现', '研究结果不会自动触发换药。']],
         refs: ['esmo-ctdna-2022']
       },
       {
@@ -633,7 +633,7 @@
     if (week === 2) {
       title = '研究性证据返回';
       const evidence = result.evidence || result.run.state.evidence;
-      body = Object.entries(evidence || {}).map(([key, item]) => `<section class="recap-card"><strong>${key === 'ctdna' ? 'ctDNA 趋势' : 'B2M / MHC-I 面板'}</strong><p>${escapeHtml(item.status)}</p><p>${escapeHtml(item.confidence)} · ${escapeHtml(item.interpretation)}</p></section>`).join('');
+      body = Object.entries(evidence || {}).map(([key, item]) => `<section class="recap-card"><strong>${key === 'ctdna' ? 'ctDNA 检出状态' : 'B2M / MHC-I 面板'}</strong><p>${escapeHtml(item.status)}</p><p>${escapeHtml(item.confidence)} · ${escapeHtml(item.interpretation)}</p></section>`).join('');
       body += '<div class="notice"><b>决策边界</b><span>研究性证据只能修正置信度，不会自动更换治疗路径。</span></div>';
     } else if (week === 4) {
       title = '安全复核';

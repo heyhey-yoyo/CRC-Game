@@ -26,9 +26,15 @@
   }
 
   function normalizeSave(raw) {
-    if (!raw || typeof raw !== 'object') throw new Error('存档格式无效。');
-    const payload = raw.payload || raw;
-    const schema = Number(raw.schemaVersion || payload.schemaVersion || 1);
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('存档格式无效。');
+    const wrapped = Object.prototype.hasOwnProperty.call(raw, 'payload');
+    const payload = wrapped ? raw.payload : raw;
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('存档内容格式无效。');
+    for (const version of [raw.schemaVersion, payload.schemaVersion]) {
+      if (version !== undefined && version !== 1 && version !== SAVE_SCHEMA) throw new Error('不支持的存档 schema 版本。');
+    }
+    if (wrapped && raw.schemaVersion !== undefined && payload.schemaVersion !== undefined && raw.schemaVersion !== payload.schemaVersion) throw new Error('存档内外 schema 版本不一致。');
+    const schema = payload.schemaVersion ?? raw.schemaVersion ?? 1;
     const migrated = schema === 1 ? { ...payload, schemaVersion: SAVE_SCHEMA, ui: payload.ui || {} } : { ...payload };
     migrated.schemaVersion = SAVE_SCHEMA;
     if (!migrated.appVersion) migrated.appVersion = '0.7.0';
@@ -50,8 +56,10 @@
 
   function verifyEnvelope(raw) {
     if (!raw || typeof raw !== 'object') throw new Error('存档为空或损坏。');
-    const payload = normalizeSave(raw.payload || raw);
-    if (raw.checksum && raw.checksum !== checksum(payload)) throw new Error('存档校验失败，文件可能不完整。');
+    const payload = normalizeSave(raw);
+    const wrapped = Object.prototype.hasOwnProperty.call(raw, 'payload');
+    if (wrapped && (typeof raw.checksum !== 'string' || !/^[0-9a-f]{8}$/.test(raw.checksum))) throw new Error('存档封套缺少有效 checksum。');
+    if (raw.checksum && raw.checksum !== checksum(wrapped ? raw.payload : raw)) throw new Error('存档校验失败，文件可能不完整。');
     return payload;
   }
 

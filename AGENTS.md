@@ -42,7 +42,7 @@
 | `pages/` | methods / references / privacy / accessibility 静态说明页 |
 | `scripts/build.mjs` | 生产构建：清空重建 dist/、SITE_URL 时生成 sitemap/canonical、standalone 单文件、checksums.txt |
 | `scripts/validate-content.mjs` | 内容校验（build 与测试共用） |
-| `tests/` | 7 个测试文件（模拟/内容/存档/静态/链接/构建 + Playwright smoke） |
+| `tests/` | Node 回归、Playwright smoke 与仅供兼容参考的旧 Python smoke |
 | `docs/` | ARCHITECTURE、DEPLOYMENT、MEDICAL_BOUNDARIES、RELEASE_CHECKLIST、ROLLBACK 等 |
 | `package.json` / `package-lock.json` | npm 脚本、版本常量与锁定依赖（无运行时依赖） |
 | `playwright.config.mjs` | 浏览器冒烟测试配置 |
@@ -55,7 +55,7 @@
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-npm run check            # 语法检查 7 个文件
+npm run check            # 检查应用、Worker、Service Worker 与构建/内容校验脚本语法
 npm run validate:content # 内容包校验
 npm test                 # Node 单元测试
 npm run build            # 生产构建（SITE_URL=https://你的域名 npm run build）
@@ -64,7 +64,7 @@ npm run test:browser     # Playwright 冒烟（须先 build，用 dist/standalon
 npm run release:check    # 全部串联：check → validate:content → test → build → test:browser
 ```
 
-无 dev server，直接打开 `index.html`（file: 协议下 SW 自动跳过注册）或 `python -m http.server`。
+源码入口需通过 HTTP 服务加载内容：安装 Python 3 后运行 `python -m http.server 8000`，访问 `http://localhost:8000`。需要双击运行时，先执行 `npm run build`，再打开生成的 `crc-immune-frontier-v<应用版本>-standalone.html`；只有该单文件产物内嵌内容，`file:` 协议下不注册 Service Worker。
 
 ## 测试
 
@@ -82,13 +82,16 @@ npm run release:check
 
 ## 代码组织与风格约定
 
-- 分层架构：内容层 `data/`（JSON 唯一内容源）→ 模拟层 `js/sim-engine.js`（纯逻辑、确定性）→ 状态层 `js/storage.js` → 展示层 `js/app.js` → 离线层 `sw.js`
+发布版本以 `package.json` 为基准，同步锁文件、`APP_VERSION`、`ENGINE_VERSION`、内容清单和 SW；构建脚本从内容清单读取版本生成独立 HTML 文件名。`MODEL_VERSION` 与旧存档迁移的历史版本值独立维护，不能全局替换历史值。
+
+- 分层架构：内容层 `data/`（病例与路径配置；通用 UI 和部分病例结果文案仍在代码中）→ 模拟层 `js/sim-engine.js`（纯逻辑、确定性）→ 状态层 `js/storage.js` → 展示层 `js/app.js` → 离线层 `sw.js`
 - 模块用 `(function initX(scope){...})(window/self/globalThis)` IIFE + `module.exports` 双导出，浏览器/Worker/Node 测试三处共用
-- 内容与引擎严格分离：新病例 = 新 `data/cases/*.json` + manifest 指针，引擎不改
+- 当前只加载 manifest 的首个病例；新增或替换病例除 `data/cases/*.json` 与 manifest 外，还须修改 `scripts/build.mjs` 的复制及独立 HTML 数据路径，核对 `js/app.js` 默认病例与 `js/sim-engine.js` 的病例性状及结果文案，补内容、固定种子和浏览器回归。当前不是通用多病例引擎
+- `MODEL_VERSION` 为独立模型标识，写入每个新运行；应用/引擎交付版本仍遵循版本一致性清单。认知假设不参与生物学状态更新。已有进度缺少或不匹配模型标识时保留查看/导出，继续模拟须重开，禁止混合模型规则。
 - 确定性：`mulberry32(seed)`，隐藏性状由 `deriveHiddenTraits(seed)` 派生；`advanceRun` 拒绝倒退；**任何改变结果/迁移/校验的行为必须加固定种子回归测试**
 - 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
 - UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
-- **版本一致性**：应用版本常量需在下列位置保持一致，发布新版本时同步更新： `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（CACHE_NAME）
+- **版本一致性**：应用版本常量需在下列位置保持一致，发布新版本时同步更新： `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（APP_VERSION）；`package-lock.json` 顶层及根项目版本也须与 `package.json` 一致
 
 ### 品牌与排版
 
@@ -120,7 +123,7 @@ npm run release:check
 ## 安全与数据注意事项
 
 - 严格 CSP（`script-src 'self'`、`frame-ancestors 'none'`、`object-src 'none'` 等）+ COOP/CORP + nosniff
-- 导入存档视为不可信输入：先 `verifyEnvelope`（JSON + schema + checksum）再 `sanitizeState` 白名单清洗
+- 导入存档视为不可信输入：先 `verifyEnvelope` 校验已知 schema 及存在的 checksum；仅兼容旧裸存档省略 checksum。拒绝未知 schema、数组载荷与内外版本冲突，再由 `sanitizeState` 归一化计划枚举、事件及 UI；它不宣称对整个 `run` 递归白名单校验
 - 所有动态文字经 `escapeHtml()` 转义；CSP 仅允许同源脚本/Worker
 - 无后端、无账号、无第三方追踪；存档只存本机浏览器，只有用户主动导出才产生文件
 - **无真实患者数据**：SECURITY.md 与 MEDICAL_BOUNDARIES.md 明令禁止存档/报告中出现真实临床信息；SECURITY.md 中的版本表述以 GitHub Release 为准，不随本文件维护
@@ -137,5 +140,5 @@ npm run release:check
 >
 > - 医学内容更新流程：改 `data/` → `npm run validate:content` + `npm test` → 同步 `evidence.json` 与 `medicalBaseline` → 递增补丁版本（换 SW 缓存名）→ 固定种子回归测试（新机制须记录 8 项，见 `docs/MEDICAL_BOUNDARIES.md`）
 > - 遵守「临床事实 / 机制证据 / 游戏抽象」三类分离边界，禁止真实剂量与百分比数字
-> - 发布新版本同步更新四处版本字符串；`dist/`、`checksums.txt`、根目录 standalone 单文件是构建产物（均不入库，已被 `.gitignore` 忽略），改源码后须重跑 `npm run build`
+> - 发布新版本按「版本一致性」清单同步应用版本与锁文件；`dist/`、`checksums.txt`、根目录 standalone 单文件是构建产物（均不入库，已被 `.gitignore` 忽略），改源码后须重跑 `npm run build`
 > - 上线前必须通过 `npm run release:check`

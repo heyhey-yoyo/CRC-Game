@@ -32,3 +32,30 @@ test('storage falls back to in-memory session when browser storage is unavailabl
   await storage.remove('memory-test');
   assert.equal(await storage.load('memory-test'), null);
 });
+
+test('unknown, malformed or conflicting schemas fail even with a valid checksum', () => {
+  const envelope = JSON.parse(storage.exportText({ schemaVersion: 2, value: 7 }));
+  for (const version of [0, 3, 999, '2', null]) {
+    assert.throws(() => storage.verifyEnvelope({ ...envelope, schemaVersion: version }), /schema/);
+    assert.throws(() => storage.normalizeSave({ schemaVersion: version }), /schema/);
+  }
+  assert.throws(() => storage.verifyEnvelope({ ...envelope, schemaVersion: 1 }), /不一致/);
+  for (const payload of [null, [], 5, 'invalid']) assert.throws(() => storage.verifyEnvelope({ schemaVersion: 2, payload }), /格式/);
+  assert.throws(() => storage.normalizeSave([]), /格式/);
+  assert.equal(storage.importText(JSON.stringify(envelope)).value, 7);
+  assert.equal(storage.importText('{"pathwayId":"pembro"}').schemaVersion, 2);
+});
+
+test('known legacy envelopes verify their original payload before migration', () => {
+  const payload = { schemaVersion: 1, pathwayId: 'pembro' };
+  const envelope = { schemaVersion: 1, payload, checksum: storage.checksum(payload) };
+  const migrated = storage.verifyEnvelope(envelope);
+  assert.equal(migrated.schemaVersion, 2);
+  assert.deepEqual(migrated.ui, {});
+  assert.equal(payload.schemaVersion, 1);
+  assert.throws(() => storage.verifyEnvelope({ ...envelope, payload: { ...payload, pathwayId: 'folfoxbev' } }), /校验失败/);
+  for (const checksum of [undefined, null, '', false, 'invalid']) {
+    assert.throws(() => storage.verifyEnvelope({ ...envelope, checksum }), /checksum/);
+  }
+  assert.equal(storage.verifyEnvelope(payload).schemaVersion, 2);
+});
