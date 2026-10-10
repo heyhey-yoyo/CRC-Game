@@ -42,14 +42,15 @@
 | `pages/` | methods / references / privacy / accessibility 静态说明页 |
 | `scripts/build.mjs` | 生产构建：清空重建 dist/、SITE_URL 时生成 sitemap/canonical、standalone 单文件、checksums.txt |
 | `scripts/validate-content.mjs` | 内容校验（build 与测试共用） |
-| `tests/` | Node 回归、Playwright smoke 与仅供兼容参考的旧 Python smoke |
+| `tests/` | Node 回归、Playwright smoke 与仅供兼容参考的 Python smoke |
 | `docs/` | ARCHITECTURE、DEPLOYMENT、MEDICAL_BOUNDARIES、RELEASE_CHECKLIST、ROLLBACK 等 |
 | `package.json` / `package-lock.json` | npm 脚本、版本常量与锁定依赖（无运行时依赖） |
 | `playwright.config.mjs` | 浏览器冒烟测试配置 |
-| `requirements-dev.txt` | 历史 Python 冒烟脚本依赖（仅兼容参考） |
+| `requirements-dev.txt` | Python 冒烟脚本依赖（仅兼容参考，不参与质量门禁与构建） |
 | `LICENSE` / `CONTENT-LICENSE.md` | 程序 MIT / 原创内容与机制文档 CC BY 4.0 |
 | `CHANGELOG.md` / `CONTRIBUTING.md` / `CODE_OF_CONDUCT.md` / `SECURITY.md` | 变更记录、贡献指南、行为准则与安全政策 |
 | `.gitignore` | 忽略构建产物（`dist/`、`checksums.txt`、standalone 单文件等） |
+| `README.md` / `AGENTS.md` | 用户向项目说明与 AI 代理维护说明 |
 
 ## 运行与构建
 
@@ -71,6 +72,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `simulation.test.mjs`：同 seed 同计划结果确定性、发布病例 seed 2101 的 B2M 性状、ctDNA 可检出/假阴性且永不输出精确百分比、路径排期
 - `content.test.mjs`：内容包校验 + 三字段分离；`storage.test.mjs`：checksum 稳定性、schema 迁移、篡改检测
 - `static.test.mjs`：必需文件、CSS 排印/网格、安全头 token、SW 行为；`link.test.mjs`：本地链接完整性
+- `build.test.mjs`：构建产物校验（dist 清空重建、standalone 自包含、部署页面与离线缓存共用版本化样式）；`cache-upgrade.test.mjs`：HTML、深层模块与 Worker 共用新版 URL、离线预缓存绕过旧缓存
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
 - `browser-smoke.py` 与 `requirements-dev.txt`：Python 冒烟脚本及其依赖；默认脚本、发布门禁和 Cloudflare 构建**不得**依赖 Python 测试环境。
 
@@ -91,7 +93,7 @@ npm run release:check
 - 确定性：`mulberry32(seed)`，隐藏性状由 `deriveHiddenTraits(seed)` 派生；`advanceRun` 拒绝倒退；**任何改变结果/迁移/校验的行为必须加固定种子回归测试**
 - 单一 `document` 级事件委托，用 `data-*` 属性分发；渲染函数按 `renderAll()` 聚合
 - UI 中文文案；医学名称一律 "-like"（Pembrolizumab-like 等）划清与真实药物的界限
-- **版本一致性**：应用版本常量需在下列位置保持一致，发布新版本时同步更新： `package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（APP_VERSION）；`package-lock.json` 顶层及根项目版本也须与 `package.json` 一致
+- **版本一致性**：应用版本常量需在下列位置保持一致，发布新版本时同步更新：`package.json`、`js/app.js`、`js/sim-engine.js`、`data/content-manifest.json`、`sw.js`（APP_VERSION）；`package-lock.json` 顶层及根项目版本也须与 `package.json` 一致
 
 ### 品牌与排版
 

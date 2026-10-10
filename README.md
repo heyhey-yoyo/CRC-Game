@@ -29,32 +29,13 @@
 
 ## 本地运行
 
-需要 Node.js 20 或更高版本。浏览器测试使用项目内固定版本的 Playwright。
+需要 Node.js 20 或更高版本。
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-npm run check
-npm run validate:content
-npm test
-npm run build
 ```
 
-预览源码需先安装 Python 3，运行 `python -m http.server 8000` 并访问 `http://localhost:8000`。也可双击构建生成的 `crc-immune-frontier-v<应用版本>-standalone.html`。不要直接双击源码 `index.html`，它需要通过 HTTP 读取内容文件。
-
-首次运行浏览器测试时：
-
-```bash
-npm run test:browser:install
-npm run test:browser
-```
-
-旧的 Python 冒烟脚本与其依赖清单仅作为兼容参考保留；默认质量门禁和 Cloudflare 构建只使用上述项目内的 Node/Playwright 流程。
-
-完整发布检查：
-
-```bash
-npm run release:check
-```
+预览源码需先安装 Python 3，运行 `python -m http.server 8000` 并访问 `http://localhost:8000`。不要直接双击源码 `index.html`，它需要通过 HTTP 读取内容文件。也可先执行 `npm run build`，再双击生成的 `crc-immune-frontier-v<应用版本>-standalone.html`。
 
 ## 部署
 
