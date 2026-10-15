@@ -72,7 +72,7 @@ npm run release:check    # 全部串联：check → validate:content → test �
 - `simulation.test.mjs`：同 seed 同计划结果确定性、发布病例 seed 2101 的 B2M 性状、ctDNA 可检出/假阴性且永不输出精确百分比、路径排期
 - `content.test.mjs`：内容包校验 + 三字段分离；`storage.test.mjs`：checksum 稳定性、schema 迁移、篡改检测
 - `static.test.mjs`：必需文件、CSS 排印/网格、安全头 token、SW 行为；`link.test.mjs`：本地链接完整性
-- `build.test.mjs`：构建产物校验（dist 清空重建、standalone 自包含、部署页面与离线缓存共用版本化样式）；`cache-upgrade.test.mjs`：HTML、深层模块与 Worker 共用新版 URL、离线预缓存绕过旧缓存
+- `build.test.mjs`：构建产物校验（dist 清空重建、standalone 自包含、部署页面与离线缓存共用版本化样式）；`cache-upgrade.test.mjs`：HTML、深层模块与 Worker 共用新版 URL、离线预缓存绕过旧缓存、运行时 JSON 内容地址与 SW 预缓存版本一致
 - `browser-smoke.spec.mjs`：W0→W8 完整流程、移动端无横向溢出、收集 pageerror
 - `browser-smoke.py` 与 `requirements-dev.txt`：Python 冒烟脚本及其依赖；默认脚本、发布门禁和 Cloudflare 构建**不得**依赖 Python 测试环境。
 
@@ -132,7 +132,7 @@ npm run release:check
 - 导入存档视为不可信输入：先 `verifyEnvelope` 校验已知 schema 及存在的 checksum；仅兼容旧裸存档省略 checksum。拒绝未知 schema、数组载荷与内外版本冲突，再由 `sanitizeState` 归一化计划枚举、事件及 UI；它不宣称对整个 `run` 递归白名单校验
 - 所有动态文字经 `escapeHtml()` 转义；CSP 仅允许同源脚本/Worker
 - 无后端、无账号、无第三方追踪；存档只存本机浏览器，只有用户主动导出才产生文件
-- **无真实患者数据**：SECURITY.md 与 MEDICAL_BOUNDARIES.md 明令禁止存档/报告中出现真实临床信息；SECURITY.md 中的版本表述以 GitHub Release 为准，不随本文件维护
+- **无真实患者数据**：`SECURITY.md` 与 `docs/MEDICAL_BOUNDARIES.md` 明令禁止存档/报告中出现真实临床信息；`SECURITY.md` 中的版本表述以 GitHub Release 为准，不随本文件维护
 
 ## 标志维护约定
 
@@ -144,7 +144,7 @@ npm run release:check
 
 > **⚠️ 任何修改此项目的 AI 代理（包括未来的你自己）都必须遵守：**
 >
-> - 医学内容更新流程：改 `data/` → `npm run validate:content` + `npm test` → 同步 `evidence.json` 与 `medicalBaseline` → 递增补丁版本（换 SW 缓存名）→ 固定种子回归测试（新机制须记录 8 项，见 `docs/MEDICAL_BOUNDARIES.md`）
+> - 医学内容更新流程：改 `data/` → `npm run validate:content` + `npm test` → 同步 `evidence.json` 与 `medicalBaseline` → 递增补丁版本（换 SW 缓存名）→ 固定种子回归测试（新机制须记录 9 项，见 `docs/MEDICAL_BOUNDARIES.md`）
 > - 遵守「临床事实 / 机制证据 / 游戏抽象」三类分离边界，禁止真实剂量与百分比数字
 > - 发布新版本按「版本一致性」清单同步应用版本与锁文件；`dist/`、`checksums.txt`、根目录 standalone 单文件是构建产物（均不入库，已被 `.gitignore` 忽略），改源码后须重跑 `npm run build`
 > - 上线前必须通过 `npm run release:check`
